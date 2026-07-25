@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -15,14 +16,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 
-@WebServlet("/StaffServlet")
-public class StaffServlet extends HttpServlet {
+@WebServlet("/ManagerServlet")
+public class ManagerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		
+
 		//====================================
 		//キャッシュを禁止する
 		//→ログアウト後に「戻る」ボタンが押されても再表示されない対策
@@ -30,36 +31,68 @@ public class StaffServlet extends HttpServlet {
 		response.setHeader( "Cache-Control","no-cache, no-store, must-revalidate" );
 		response.setHeader( "Pragma", "no-cache" );
 		response.setDateHeader( "Expires", 0 );
-						
-		
+								
+				
 		request.setCharacterEncoding( "UTF-8" );
 		HttpSession session = request.getSession();
-		
+				
 		String action = request.getParameter( "action" );
 		LocalDate today = LocalDate.now();
-		
-		
+				
+				
 		// ログイン直後
 		if ( action == null ) {
-		
+				
 			List<ShiftBean> todaysShift = ShiftLogic.getTodaysShift( today );
-			
+					
 			session.setAttribute( "today", today );
 			session.setAttribute( "todaysShift", todaysShift );
-			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/staffHome.jsp" );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/managerHome.jsp" );
 			rd.forward( request, response );
-		
-		
-		// シフト希望登録
-		} else if ( ( "requestShift" ).equals( action ) ) {
+			return;
+				
+				
+		// シフト希望確認
+		} else if ( ( "checkRequestShift" ).equals( action ) ) {
+			
+			String[] nextMonth = ShiftLogic.nextMonthPeriod( today );
+			List<ShiftBean> requestShiftList = ShiftLogic.getShiftOfPeriod( "requestShift", nextMonth );
 			
 			List<LocalDate> periodDateList = ShiftLogic.createDateList( today );
-			List<LocalTime> openingHours = ShiftLogic.getOpeningHours();
+			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( requestShiftList, periodDateList );
 			
 			session.setAttribute( "periodDateList", periodDateList );
-			session.setAttribute( "openingHours", openingHours );
-			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/requestShift.jsp" );
+			session.setAttribute( "shiftMap", shiftMap );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/checkRequestShift.jsp" );
 			rd.forward( request, response );
+			return;
+		
+			
+		// シフト確定
+		} else if ( ( "confirmShift" ).equals( action ) ) {
+						
+			List<LocalTime> openingHours = ShiftLogic.getOpeningHours();
+						
+			session.setAttribute( "openingHours", openingHours );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/confirmShift.jsp" );
+			rd.forward( request, response );
+			return;
+			
+			
+		// 確定したシフトの確認
+		} else if ( ( "checkConfirmedShift" ).equals( action ) ) {
+									
+			String[] nextMonth = ShiftLogic.nextMonthPeriod( today );
+			List<ShiftBean> confirmedShiftList = ShiftLogic.getShiftOfPeriod( "confirmedShift", nextMonth );
+			
+			List<LocalDate> periodDateList = ShiftLogic.createDateList( today );
+			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( confirmedShiftList, periodDateList );
+			
+			session.setAttribute( "periodDateList", periodDateList );
+			session.setAttribute( "shiftMap", shiftMap );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/checkConfirmedShift.jsp" );
+			rd.forward( request, response );
+			return;
 		
 			
 		// ログアウト
@@ -68,7 +101,7 @@ public class StaffServlet extends HttpServlet {
 			session.invalidate();
 			
 			String message = "ログアウトしました";
-			String redirectPath = "/StaffServlet";
+			String redirectPath = "/ManagerServlet";
 			
 			request.setAttribute( "message", message );
 			request.setAttribute( "redirectPath", redirectPath );
@@ -77,13 +110,13 @@ public class StaffServlet extends HttpServlet {
 			return;
 			
 		}
-		
+				
 	}
 
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
 
+		
 		//====================================
 		//キャッシュを禁止する
 		//→ログアウト後に「戻る」ボタンが押されても再表示されない対策
@@ -100,21 +133,19 @@ public class StaffServlet extends HttpServlet {
 		
 		
 		// シフト希望リクエストを受け取る
-		if ( ( "request" ).equals( action ) ) {
+		if ( ( "confirm" ).equals( action ) ) {
 			
-			List<ShiftBean> requestShiftList = null;
+			List<ShiftBean> confirmedShiftList = null;
 			
 			try {
 				
-				requestShiftList = createShiftList( request );
-
-				ShiftLogic.registerShiftList(requestShiftList, "requestShift");
+				confirmedShiftList = createShiftList( request );
 				
-				String db = "requestShift";
-				ShiftLogic.registerShiftList( requestShiftList, db );
+				String db = "confirmedShift";
+				ShiftLogic.registerShiftList( confirmedShiftList, db );
 				
-				String message = "シフト希望を送信しました";
-				String redirectPath = "/StaffServlet";
+				String message = "シフトを登録しました";
+				String redirectPath = "/ManagerServlet";
 				
 				request.setAttribute( "message", message );
 				request.setAttribute( "redirectPath", redirectPath );
@@ -126,7 +157,7 @@ public class StaffServlet extends HttpServlet {
 				
 				e.printStackTrace( System.out );
 				
-				String redirectPath = "/StaffServlet";
+				String redirectPath = "/ManagerServlet";
 				
 				request.setAttribute( "message", e.getMessage() );
 				request.setAttribute( "redirectPath", redirectPath );
@@ -138,93 +169,93 @@ public class StaffServlet extends HttpServlet {
 			
 			
 		}
-		
-		
 	}
 	
 	
 	@SuppressWarnings("unchecked")
 	public static List<ShiftBean> createShiftList( HttpServletRequest request ) {
 		
-		List<ShiftBean> requestShiftList = new ArrayList<ShiftBean>();
+		List<ShiftBean> confirmedShiftList = new ArrayList<ShiftBean>();
 		
 		HttpSession session = request.getSession();
-		UserBean user = ( UserBean )session.getAttribute( "user" );
 		List<LocalTime> openingHours = ( List<LocalTime> )session.getAttribute( "openingHours" );
 		
-		if ( user == null || openingHours == null || openingHours.isEmpty() ) {
+		if ( openingHours == null || openingHours.isEmpty() ) {
 		    throw new IllegalArgumentException( "画面情報を取得できませんでした。" );
 		}
 		
+		String[] userIdList = request.getParameterValues( "userId" );
 		String[] shiftDateList = request.getParameterValues( "shiftDate" );
 		String[] startTimeList = request.getParameterValues( "startTime" );
 		String[] endTimeList = request.getParameterValues( "endTime" );
 		
-		if ( shiftDateList == null || startTimeList == null || endTimeList == null
+		if ( userIdList == null || shiftDateList == null || startTimeList == null || endTimeList == null
 				|| shiftDateList.length == 0
-				|| shiftDateList.length != startTimeList.length
-		        || shiftDateList.length != endTimeList.length ) {
+				|| shiftDateList.length != userIdList.length
+				|| shiftDateList.length != startTimeList.length || shiftDateList.length != endTimeList.length ) {
 		    throw new IllegalArgumentException( "不正なリクエストです。" );
 		}
 		
 		for ( int i = 0; i < shiftDateList.length; i ++ ) {
 			
-			ShiftBean sb = new ShiftBean();
-			
-			sb.setUserId( user.getUserId() );
-			sb.setUserName( user.getUserName() );
-			
 			LocalDate shiftDate = LocalDate.parse( shiftDateList[i] );
-			sb.setShiftDate( shiftDate );
 			
-			String allDay = request.getParameter( "allDay_" + shiftDate );
-			String dayOff = request.getParameter( "dayOff_" + shiftDate );
+			String allDay = request.getParameter( "allDay_" + shiftDate + "_" + userIdList[i] );
+			String dayOff = request.getParameter( "dayOff_" + shiftDate + "_" + userIdList[i] );
 			
 			String startTimeValue = startTimeList[i];
 			String endTimeValue = endTimeList[i];
 			
-			// 休み希望
-			if ( dayOff != null ) {
-				
-				sb.setDayOff( true );
+			boolean startBlank = startTimeValue == null || startTimeValue.isBlank();
+
+			boolean endBlank = endTimeValue == null || endTimeValue.isBlank();
 			
-			// 終日OK
-			} else if ( allDay != null ) {
+			if ( startBlank && endBlank && allDay == null && dayOff == null ) {
+				continue;
 				
-				sb.setStartTime( openingHours.getFirst() );
-				sb.setEndTime( openingHours.getLast() );
+			} else if ( startBlank != endBlank ) {
+				throw new IllegalArgumentException( shiftDate + "の時刻が正しく選択されていません" );
 				
-				sb.setDayOff( false );
-			
-			// それ以外（時間帯指定によるシフト希望）
 			} else {
+			
+				ShiftBean sb = new ShiftBean();
+				sb.setUserId( userIdList[i] );
+				sb.setShiftDate( shiftDate );
+			
+				// 休み希望
+				if ( dayOff != null ) {
 				
-				if ( startTimeValue == null || startTimeValue.isBlank()
-			            || endTimeValue == null || endTimeValue.isBlank() ) {
+					sb.setDayOff( true );
+			
+				// 終日OK
+				} else if ( allDay != null ) {
+				
+					sb.setStartTime( openingHours.getFirst() );
+					sb.setEndTime( openingHours.getLast() );
+				
+					sb.setDayOff( false );
+			
+				// それ以外（時間帯指定によるシフト希望）
+				} else {
 
-			        throw new IllegalArgumentException(
-			                shiftDate + "の希望を入力してください" );
-			    }
+					LocalTime startTime = LocalTime.parse( startTimeValue );
+					LocalTime endTime = LocalTime.parse( endTimeValue );
 
-			    LocalTime startTime = LocalTime.parse( startTimeValue );
-			    LocalTime endTime = LocalTime.parse( endTimeValue );
-
-			    if ( !endTime.isAfter( startTime ) ) {
-			        throw new IllegalArgumentException(
-			                shiftDate + "の終了時刻は開始時刻より後にしてください" );
-			    }
+					if ( !endTime.isAfter( startTime ) ) {
+						throw new IllegalArgumentException( shiftDate + "の終了時刻は開始時刻より後にしてください" );
+					}
 				
-				sb.setStartTime( startTime );
-				sb.setEndTime( endTime );
+					sb.setStartTime( startTime );
+					sb.setEndTime( endTime );
 				
-				sb.setDayOff( false );
+					sb.setDayOff( false );
 				
+				}
+			
+				confirmedShiftList.add( sb );
 			}
-			
-			requestShiftList.add( sb );
-			
 		}
-		return requestShiftList;
+		return confirmedShiftList;
 	}
 
 }
