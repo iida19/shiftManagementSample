@@ -23,7 +23,7 @@ public class SMSListener implements ServletContextListener {
 	    	
 	        Class.forName( "org.h2.Driver" );
 	        
-	        String path = sce.getServletContext().getRealPath( "/WEB-INF/db/partTimeShift" );
+	        String path = sce.getServletContext().getRealPath( "/WEB-INF/db/shiftManagementSample" );
 	        String url = "jdbc:h2:file:" + path;
 	        DBManager.setUrl( url );
 
@@ -50,13 +50,28 @@ public class SMSListener implements ServletContextListener {
 	            """);
 	            
 	            st.execute("""
+		            CREATE TABLE IF NOT EXISTS requestShift(
+		            	shiftId INT AUTO_INCREMENT PRIMARY KEY,
+		            	userID VARCHAR(10),
+		            	shiftDate DATE NOT NULL,
+		            	startTime TIME,
+		            	endTime TIME,
+		            	dayOff BOOLEAN NOT NULL,
+		            	
+		            	UNIQUE ( userId, shiftDate )
+		            )		
+		        """);
+	            
+	            st.execute("""
 	            	CREATE TABLE IF NOT EXISTS confirmedShift(
 	            		shiftId INT AUTO_INCREMENT PRIMARY KEY,
 	            		userID VARCHAR(10),
 	            		shiftDate DATE NOT NULL,
 	            		startTime TIME,
 	            		endTime TIME,
-	            		dayOff BOOLEAN NOT NULL
+	            		dayOff BOOLEAN NOT NULL,
+	            		
+	            		UNIQUE ( userId, shiftDate )
 	            	)		
 	            """);
 
@@ -184,12 +199,12 @@ public class SMSListener implements ServletContextListener {
 	        	
 	        		List<ShiftBean> sampleList = List.of(
 	        			new ShiftBean(	"00002",
-	        									LocalDate.of( 2026, 7, 24), LocalTime.of( 9, 0 ), LocalTime.of( 14, 0 ) ),
-	        			new ShiftBean(	"00003", LocalDate.of( 2026, 7, 24), true ),
+	        									LocalDate.of( 2026, 7, 26 ), LocalTime.of( 9, 0 ), LocalTime.of( 14, 0 ) ),
+	        			new ShiftBean(	"00003", LocalDate.of( 2026, 7, 26 ), true ),
 	        			new ShiftBean(	"00004",
-												LocalDate.of( 2026, 7, 24), LocalTime.of( 17, 0 ), LocalTime.of( 22, 0 ) ),
+												LocalDate.of( 2026, 7, 26 ), LocalTime.of( 17, 0 ), LocalTime.of( 22, 0 ) ),
 	        			new ShiftBean(	"00005",
-								LocalDate.of( 2026, 7, 24), LocalTime.of( 9, 0 ), LocalTime.of( 22, 0 ) )
+								LocalDate.of( 2026, 7, 26 ), LocalTime.of( 9, 0 ), LocalTime.of( 22, 0 ) )
 	        			);
 	        	
 	        		for ( ShiftBean s : sampleList ) {

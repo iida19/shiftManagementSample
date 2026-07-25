@@ -10,7 +10,7 @@
 
 	<body>
 	
-		<form action="<%=request.getContextPath() %>/StaffServlet" method="get">
+		<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
 			<input type="hidden" name="action" value="requestShift">
 			<input type="submit" value="シフト希望提出">
 		</form>

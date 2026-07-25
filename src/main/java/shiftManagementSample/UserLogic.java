@@ -1,6 +1,5 @@
 package shiftManagementSample;
 
-
 public class UserLogic {
 	
 	public UserLogic() {}

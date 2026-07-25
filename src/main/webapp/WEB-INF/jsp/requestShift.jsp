@@ -2,14 +2,6 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<%@ page import="shiftManagementSample.UserBean" %>
-<%
-	UserBean u = ( UserBean )session.getAttribute( "user" );
-	if ( u == null ) {
-		response.sendRedirect( request.getContextPath() + "/login.jsp" );
-		return;
-	}
-%>
 	
 <!DOCTYPE html>
 <html>
@@ -20,13 +12,15 @@
 	</head>
 
 	<body>
+		
+		<jsp:include page="staffHeader.jsp"></jsp:include>
 	
-		<form action="${ pageContext.request.contextPath }/RequestShiftServlet" method="post">
+		<form action="${ pageContext.request.contextPath }/StaffServlet" method="post">
 		
 			<table>	
 		
 				<tr>
-					<th>${  ( periodDateList[0] ).monthValue }月</th>
+					<th>${ periodDateList[0].monthValue }月</th>
 				</tr>
 			
 				<c:forEach var="date" items="${ periodDateList }">
@@ -35,12 +29,14 @@
 						<td>
 							<input type="hidden" name="shiftDate" value="${ date }">
 							<select name="startTime">
+								<option value="">--選択--</option>
 								<c:forEach var="hour" items="${ openingHours }">
 									<option value="${ hour }">${ hour }</option>
 								</c:forEach>
 							</select>
 							〜
 							<select name="endTime">
+								<option value="">--選択--</option>
 								<c:forEach var="hour" items="${ openingHours }">
 									<option value="${ hour }">${ hour }</option>
 								</c:forEach>
@@ -59,6 +55,10 @@
 			
 			<button type="submit" name="action" value="request">送信</button>
 		
+		</form>
+		
+		<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
+			<button type="submit" name="action" value="logout">ログアウト</button>
 		</form>
 
 	</body>

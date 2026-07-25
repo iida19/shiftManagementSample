@@ -66,59 +66,37 @@ public class ShiftDAO {
     }
 
 
-    public static void insert( ShiftBean s, String table ) {
+    public static void save( ShiftBean s, String table ) {
 
-        if ( s.isDayOff() ) {
+		
+		String sql = "MERGE INTO " + table +
+				"( userId, shiftDate, startTime, endTime, dayOff ) " +
+				"KEY( userId, shiftDate ) " +
+				"VALUES ( ?, ?, ?, ?, ? )";
+		// id INT AUTO_INCREMENT PRIMARY KEY,
+		// → H2が自動で入れてくれるので渡す必要なし
 
-            String userId = s.getUserId();
-            LocalDate shiftDate = s.getShiftDate();
-            boolean dayOff = s.isDayOff();
+		try (
+				Connection con = DBManager.getConnection();
+				PreparedStatement pstmt = con.prepareStatement(sql);
+		) {
+			pstmt.setString( 1, s.getUserId() );
+			pstmt.setObject( 2, s.getShiftDate() );
+			
+			if ( s.isDayOff() ) {
+				pstmt.setNull( 3, java.sql.Types.TIME );
+				pstmt.setNull( 4, java.sql.Types.TIME );
+			} else {
+				pstmt.setObject( 3, s.getStartTime() );
+				pstmt.setObject( 4, s.getEndTime() );
+			}
 
-            String sql =	"INSERT INTO " + table + "( userId, shiftDate, dayOff ) " +
-                    			"VALUES( ?, ?, ? )";
-            // id INT AUTO_INCREMENT PRIMARY KEY,
-            // → H2が自動で入れてくれるので渡す必要なし
+			pstmt.setBoolean(5, s.isDayOff());
+			pstmt.executeUpdate();
 
-            try (
-                    Connection con = DBManager.getConnection();
-                    PreparedStatement pstmt = con.prepareStatement(sql);
-            ) {
-                pstmt.setString( 1, userId );
-                pstmt.setObject( 2, shiftDate );
-                pstmt.setObject( 3, dayOff );
-                pstmt.executeUpdate();
-                
-            } catch ( Exception e ) {
-                e.printStackTrace( System.out );
-                throw new RuntimeException( e );
-            }
-
-        } else {
-
-            String userId = s.getUserId();
-            LocalDate shiftDate = s.getShiftDate();
-            LocalTime startTime = s.getStartTime();
-            LocalTime endTime = s.getEndTime();
-
-            String sql =	"INSERT INTO " + table + "( userId, shiftDate, startTime, endTime ) " +
-                    			"VALUES( ?, ?, ?, ? )";
-            // id INT AUTO_INCREMENT PRIMARY KEY,
-            // → H2が自動で入れてくれるので渡す必要なし
-
-            try (
-                    Connection con = DBManager.getConnection();
-                    PreparedStatement pstmt = con.prepareStatement(sql);
-            ) {
-                pstmt.setString( 1, userId );
-                pstmt.setObject( 2, shiftDate );
-                pstmt.setObject( 3, startTime );
-                pstmt.setObject( 4, endTime );
-                pstmt.executeUpdate();
-                
-            } catch ( Exception e ) {
-                e.printStackTrace( System.out );
-                throw new RuntimeException( e );
-            }
-        }
-    }
+		} catch ( Exception e ) {
+			e.printStackTrace( System.out );
+			throw new RuntimeException( e );
+		}
+	}
 }
