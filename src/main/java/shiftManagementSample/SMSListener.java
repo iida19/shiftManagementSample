@@ -31,6 +31,7 @@ public class SMSListener implements ServletContextListener {
 	            Connection con = DBManager.getConnection();
 	            Statement st = con.createStatement()
 	        ) {
+	        	
 	            st.execute("""
 	                CREATE TABLE IF NOT EXISTS users(
 	                    userId VARCHAR(10),
@@ -50,9 +51,22 @@ public class SMSListener implements ServletContextListener {
 	            """);
 	            
 	            st.execute("""
+	            	CREATE TABLE IF NOT EXISTS temporarySavedShift(
+	            		shiftId INT AUTO_INCREMENT PRIMARY KEY,
+	            		userId VARCHAR(10),
+	            		shiftDate DATE NOT NULL,
+	            		startTime TIME,
+	            		endTime TIME,
+	            		dayOff BOOLEAN NOT NULL,
+			            	
+	            		UNIQUE ( userId, shiftDate )
+	            	)
+	            """);
+	            
+	            st.execute("""
 		            CREATE TABLE IF NOT EXISTS requestShift(
 		            	shiftId INT AUTO_INCREMENT PRIMARY KEY,
-		            	userID VARCHAR(10),
+		            	userId VARCHAR(10),
 		            	shiftDate DATE NOT NULL,
 		            	startTime TIME,
 		            	endTime TIME,
@@ -65,7 +79,7 @@ public class SMSListener implements ServletContextListener {
 	            st.execute("""
 	            	CREATE TABLE IF NOT EXISTS confirmedShift(
 	            		shiftId INT AUTO_INCREMENT PRIMARY KEY,
-	            		userID VARCHAR(10),
+	            		userId VARCHAR(10),
 	            		shiftDate DATE NOT NULL,
 	            		startTime TIME,
 	            		endTime TIME,
@@ -108,11 +122,11 @@ public class SMSListener implements ServletContextListener {
 	        	) {
 	        	
 	        		List<UserBean> sampleList = List.of(
-	        			new UserBean( "00001", "店長 タクマ", "1234", "0" ),
-	        			new UserBean( "00002", "店員 ミナト", "1234", "1" ),
-	        			new UserBean( "00003", "店員 メグミ", "1234", "1" ),
-	        			new UserBean( "00004", "店員 アユミ", "1234", "1" ),
-	        			new UserBean( "00005", "店員 イズミ", "1234", "1" )
+	        			new UserBean( "00001", "店長 タクマ", "1234", "1" ),
+	        			new UserBean( "00002", "店員 ミナト", "1234", "0" ),
+	        			new UserBean( "00003", "店員 メグミ", "1234", "0" ),
+	        			new UserBean( "00004", "店員 アユミ", "1234", "0" ),
+	        			new UserBean( "00005", "店員 イズミ", "1234", "0" )
 	        			);
 	        	
 	        		for ( UserBean u : sampleList ) {

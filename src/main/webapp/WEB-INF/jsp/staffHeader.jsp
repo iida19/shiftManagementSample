@@ -9,11 +9,19 @@
 	</head>
 
 	<body>
-	
-		<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
-			<input type="hidden" name="action" value="requestShift">
-			<input type="submit" value="シフト希望提出">
-		</form>
+		
+		<div style="display: flex; gap: 30px; align-items: flex-start;">
+		
+			<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
+				<input type="submit" value="ホームへ">
+			</form>
+		
+			<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
+				<input type="hidden" name="action" value="requestShift">
+				<input type="submit" value="シフト希望提出">
+			</form>
+		
+		</div>
 
 	</body>
 

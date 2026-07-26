@@ -55,8 +55,8 @@ public class ManagerServlet extends HttpServlet {
 		// シフト希望確認
 		} else if ( ( "checkRequestShift" ).equals( action ) ) {
 			
-			String[] nextMonth = ShiftLogic.nextMonthPeriod( today );
-			List<ShiftBean> requestShiftList = ShiftLogic.getShiftOfPeriod( "requestShift", nextMonth );
+			LocalDate targetDay = today.plusMonths( 1 );
+			List<ShiftBean> requestShiftList = ShiftLogic.getShiftOfPeriod( "requestShift", targetDay );
 			
 			List<LocalDate> periodDateList = ShiftLogic.createDateList( today );
 			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( requestShiftList, periodDateList );
@@ -82,8 +82,8 @@ public class ManagerServlet extends HttpServlet {
 		// 確定したシフトの確認
 		} else if ( ( "checkConfirmedShift" ).equals( action ) ) {
 									
-			String[] nextMonth = ShiftLogic.nextMonthPeriod( today );
-			List<ShiftBean> confirmedShiftList = ShiftLogic.getShiftOfPeriod( "confirmedShift", nextMonth );
+			LocalDate targetDay = today.plusMonths( 1 );
+			List<ShiftBean> confirmedShiftList = ShiftLogic.getShiftOfPeriod( "confirmedShift", targetDay );
 			
 			List<LocalDate> periodDateList = ShiftLogic.createDateList( today );
 			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( confirmedShiftList, periodDateList );
@@ -91,6 +91,33 @@ public class ManagerServlet extends HttpServlet {
 			session.setAttribute( "periodDateList", periodDateList );
 			session.setAttribute( "shiftMap", shiftMap );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/checkConfirmedShift.jsp" );
+			rd.forward( request, response );
+			return;
+			
+		
+		// 従業員管理
+		} else if ( ( "managementUser" ).equals( action ) ) {
+			
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/managementUserMenu.jsp" );
+			rd.forward( request, response );
+			return;
+			
+			
+		// 新規従業員登録
+		} else if ( ( "registerUser" ).equals( action ) ) {
+			
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/registerUser.jsp" );
+			rd.forward( request, response );
+			return;
+			
+			
+		// 従業員削除
+		} else if ( ( "deleteUser" ).equals( action ) ) {
+			
+			List<UserBean> userList = UserDAO.findAll();
+			
+			request.setAttribute( "userList", userList );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/deleteUser.jsp" );
 			rd.forward( request, response );
 			return;
 		
@@ -132,7 +159,7 @@ public class ManagerServlet extends HttpServlet {
 		String action = request.getParameter( "action" );
 		
 		
-		// シフト希望リクエストを受け取る
+		// シフトを確定する
 		if ( ( "confirm" ).equals( action ) ) {
 			
 			List<ShiftBean> confirmedShiftList = null;
@@ -166,6 +193,75 @@ public class ManagerServlet extends HttpServlet {
 				return;
 				
 			}
+			
+		
+		// 新規従業員登録
+		} else if ( ( "register" ).equals( action ) ) {
+			
+			String userId = request.getParameter( "userId" );
+			String userName = request.getParameter( "userName" );
+			String role = request.getParameter( "role" );
+		
+			UserBean u = new UserBean( userId, userName, role );
+			int status = UserLogic.registerUser( u );
+					// 0で登録成功、1はユーザー名重複、2は空欄あり
+			
+			
+			if ( status == 0 ) {
+				
+				String message = "登録しました。";
+				String redirectPath = "/ManagerServlet";
+				request.setAttribute( "message", message );
+				request.setAttribute( "redirectPath", redirectPath );
+				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/message.jsp" );
+				rd.forward( request, response );
+				return;
+				
+			} else if ( status == 1 ) {
+				
+				String errorMessage = "ユーザーID " + u.getUserId() + " が重複しています";
+				request.setAttribute( "em", errorMessage );
+				request.setAttribute( "userId", u.getUserId() );
+				request.setAttribute( "userName", u.getUserName() );
+				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/registerUser.jsp" );
+				rd.forward( request, response );
+				return;
+				
+			} else if ( status == 2 ) {
+						
+				String errorMessage = "入力されていない項目があるようです";
+				request.setAttribute( "em", errorMessage );
+				request.setAttribute( "userName", u.getUserName() );
+				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/registerUser.jsp" );
+				rd.forward( request, response );
+				return;
+			
+			} else if ( status == -1 ) {
+				
+				System.out.println( "register statusが未判定です" );
+				String errorMessage = "処理に問題が発生しました。すみませんがもう一度お試しください。";
+				request.setAttribute( "em", errorMessage );
+				request.setAttribute( "userName", u.getUserName() );
+				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/registerUser.jsp" );
+				rd.forward( request, response );
+				return;
+				
+			}
+			
+			
+		// 従業員削除
+		} else if ( ( "delete" ).equals( action ) ) {
+			
+			String[] deleteId = request.getParameterValues( "deleteId" );
+			UserLogic.deleteUser( deleteId );
+			
+			String message = "削除しました。";
+			String redirectPath = "/ManagerServlet";
+			request.setAttribute( "message", message );
+			request.setAttribute( "redirectPath", redirectPath );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/message.jsp" );
+			rd.forward( request, response );
+			return;
 			
 			
 		}
@@ -207,13 +303,9 @@ public class ManagerServlet extends HttpServlet {
 			String endTimeValue = endTimeList[i];
 			
 			boolean startBlank = startTimeValue == null || startTimeValue.isBlank();
-
 			boolean endBlank = endTimeValue == null || endTimeValue.isBlank();
 			
-			if ( startBlank && endBlank && allDay == null && dayOff == null ) {
-				continue;
-				
-			} else if ( startBlank != endBlank ) {
+			if ( startBlank != endBlank ) {
 				throw new IllegalArgumentException( shiftDate + "の時刻が正しく選択されていません" );
 				
 			} else {
@@ -222,12 +314,12 @@ public class ManagerServlet extends HttpServlet {
 				sb.setUserId( userIdList[i] );
 				sb.setShiftDate( shiftDate );
 			
-				// 休み希望
-				if ( dayOff != null ) {
+				// 休み
+				if ( startBlank && endBlank && allDay == null && dayOff == null ) {
 				
 					sb.setDayOff( true );
 			
-				// 終日OK
+				// 終日
 				} else if ( allDay != null ) {
 				
 					sb.setStartTime( openingHours.getFirst() );

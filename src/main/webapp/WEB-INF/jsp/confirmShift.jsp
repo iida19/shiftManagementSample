@@ -112,9 +112,6 @@
 											<td>
 												<input type="checkbox" name="allDay_${ date }_${ shift.userId }" value="true">終日
 											</td>
-											<td>
-												<input type="checkbox" name="dayOff_${ date }_${ shift.userId }" value="true">休み
-											</td>
 													
 										</tr>
 									</c:forEach>

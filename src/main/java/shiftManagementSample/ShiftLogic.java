@@ -37,24 +37,15 @@ public class ShiftLogic {
 	}
 	
 	
-	public static String[] nextMonthPeriod( LocalDate today ) {
+	public static List<ShiftBean> getShiftOfPeriod( String table, LocalDate targetDay ) {
 		
-		String[] nextMonthPeriod = new String[2];
+		String[] monthPeriod = new String[2];
 		
-		LocalDate nextMonth = today.plusMonths( 1 );
-		
-		nextMonthPeriod[0] = String.valueOf( nextMonth.getYear() );
-		nextMonthPeriod[1] = String.valueOf( nextMonth.getMonthValue() );
-		
-		return nextMonthPeriod;
-		
-	}
+		monthPeriod[0] = String.valueOf( targetDay.getYear() );
+		monthPeriod[1] = String.valueOf( targetDay.getMonthValue() );
 	
-	
-	public static List<ShiftBean> getShiftOfPeriod( String table, String[] period ) {
-		
-		int year = Integer.parseInt( period[0] );
-		int month = Integer.parseInt( period[1] );
+		int year = Integer.parseInt( monthPeriod[0] );
+		int month = Integer.parseInt( monthPeriod[1] );
 		
 		LocalDate start = LocalDate.of( year, month, 1 );
 		LocalDate end = start.plusMonths( 1 );
@@ -63,6 +54,44 @@ public class ShiftLogic {
 		
 		return list;
 		
+	}
+	
+	
+	public static List<ShiftBean> getShiftOfUser( String table, String userId, LocalDate targetDay ) {
+		
+		String[] monthPeriod = new String[2];
+		
+		monthPeriod[0] = String.valueOf( targetDay.getYear() );
+		monthPeriod[1] = String.valueOf( targetDay.getMonthValue() );
+	
+		int year = Integer.parseInt( monthPeriod[0] );
+		int month = Integer.parseInt( monthPeriod[1] );
+		
+		LocalDate start = LocalDate.of( year, month, 1 );
+		LocalDate end = start.plusMonths( 1 );
+		
+		List<ShiftBean> list = ShiftDAO.findByUserAndPeriod( table, userId, start, end );
+		
+		return list;
+		
+	}
+	
+	
+	public static Map<LocalDate, ShiftBean> makeUserShiftMap( List<ShiftBean> listOfPeriod, List<LocalDate> periodList ) {
+		
+		Map<LocalDate, ShiftBean> shiftMap = new LinkedHashMap<>();
+		
+		for ( LocalDate date : periodList ) {
+			
+			for ( ShiftBean shift : listOfPeriod ) {
+				
+				if ( date.equals( shift.getShiftDate() ) ) {
+					shiftMap.put( date, shift );
+				}
+				
+			}
+		}
+		return shiftMap;
 	}
 	
 	
@@ -87,15 +116,14 @@ public class ShiftLogic {
 	}
 	
 	
-	public static List<LocalDate> createDateList( LocalDate today ) {
+	public static List<LocalDate> createDateList( LocalDate targetDay ) {
 		
 		List<LocalDate> list = new ArrayList<LocalDate>();
 		
-		LocalDate targetMonth = today.plusMonths( 1 );
-		int yearOfPeriod = targetMonth.getYear();
-		int monthOfPeriod = targetMonth.getMonthValue();
+		int yearOfPeriod = targetDay.getYear();
+		int monthOfPeriod = targetDay.getMonthValue();
 		
-		for ( int i = 1; i <= targetMonth.lengthOfMonth(); i ++ ) {
+		for ( int i = 1; i <= targetDay.lengthOfMonth(); i ++ ) {
 			
 			LocalDate date = LocalDate.of( yearOfPeriod, monthOfPeriod, i );
 			list.add( date );

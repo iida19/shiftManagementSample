@@ -13,22 +13,22 @@ public class ShiftDAO {
 
     public static List<ShiftBean> findByPeriod( String table, LocalDate start, LocalDate end ) {
 
-        List<ShiftBean> list = new ArrayList<ShiftBean>();
-        String sql =	"SELECT " + table + ".*, users.userName " +
+    	List<ShiftBean> list = new ArrayList<ShiftBean>();
+    	String sql =	"SELECT " + table + ".*, users.userName " +
         					"FROM " + table +
 							" INNER JOIN users ON " + table +".userId = users.userId" +
         					" WHERE shiftDate >= ? AND shiftDate < ?" +
         					" ORDER BY shiftDate ASC, dayOff ASC, startTime ASC, " + table +".userId ASC";
 
-        try (
-                Connection con = DBManager.getConnection();
-                PreparedStatement pstmt = con.prepareStatement( sql )
-        ) {
+    	try (
+    			Connection con = DBManager.getConnection();
+    			PreparedStatement pstmt = con.prepareStatement( sql )
+    	) {
+    		
+    		pstmt.setObject( 1, start );
+    		pstmt.setObject( 2, end );
         	
-        	pstmt.setObject( 1, start );
-        	pstmt.setObject( 2, end );
-        	
-        	try ( ResultSet rs = pstmt.executeQuery() ) {
+    		try ( ResultSet rs = pstmt.executeQuery() ) {
 
         		while ( rs.next() ) {
 
@@ -58,11 +58,63 @@ public class ShiftDAO {
         		}
         	}
 
-        } catch ( Exception e ) {
-            e.printStackTrace( System.out );
-            throw new RuntimeException( e );
-        }
-        return list;
+    	} catch ( Exception e ) {
+    		e.printStackTrace( System.out );
+    		throw new RuntimeException( e );
+    	}
+    	return list;
+    }
+    
+    
+    public static List<ShiftBean> findByUserAndPeriod( String table, String userId, LocalDate start, LocalDate end ) {
+
+    	List<ShiftBean> list = new ArrayList<ShiftBean>();
+    	String sql =	"SELECT * FROM " + table +
+        					" WHERE userId = ? AND shiftDate >= ? AND shiftDate < ?" +
+        					" ORDER BY shiftDate ASC";
+
+    	try (
+    			Connection con = DBManager.getConnection();
+    			PreparedStatement pstmt = con.prepareStatement( sql )
+    	) {
+    		
+    		pstmt.setString( 1, userId );
+    		pstmt.setObject( 2, start );
+    		pstmt.setObject( 3, end );
+        	
+    		try ( ResultSet rs = pstmt.executeQuery() ) {
+
+        		while ( rs.next() ) {
+
+        			if ( rs.getBoolean( "dayOff" ) ) {
+
+        				ShiftBean s = new ShiftBean();
+        				s.setShiftId( rs.getInt( "shiftId" ) );
+        				s.setUserId( rs.getString( "userId" ) );
+        				s.setShiftDate( rs.getObject( "shiftDate", LocalDate.class ) );
+        				s.setDayOff( rs.getBoolean( "dayOff" ) );
+        				list.add( s );
+
+        			} else {
+
+        				ShiftBean s = new ShiftBean();
+        				s.setShiftId( rs.getInt( "shiftId" ) );
+        				s.setUserId( rs.getString( "userId" ) );
+        				s.setShiftDate( rs.getObject( "shiftDate", LocalDate.class ) );
+        				s.setStartTime( rs.getObject( "startTime", LocalTime.class ) );
+        				s.setEndTime( rs.getObject( "endTime", LocalTime.class ) );
+        				s.setDayOff( rs.getBoolean( "dayOff" ) );
+        				list.add( s );
+
+        			}
+        		}
+        	}
+
+    	} catch ( Exception e ) {
+    		e.printStackTrace( System.out );
+    		throw new RuntimeException( e );
+    	}
+    	return list;
     }
 
 

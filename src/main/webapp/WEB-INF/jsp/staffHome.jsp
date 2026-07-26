@@ -13,30 +13,78 @@
 	
 		<jsp:include page="staffHeader.jsp"></jsp:include>
 		
-		<table>
+		<div style="display: flex; gap: 30px; align-items: flex-start;">
 			
-			<c:choose>
-				<c:when test = "${ not empty todaysShift }">
-					<c:forEach var="s" items="${ todaysShift }">
-						<tr>
-							<td>${ s.userName }</td>
-								<c:choose>
-									<c:when test = "${ not s.dayOff }">
-										<td>${ s.startTime } ～ ${ s.endTime }</td>
-									</c:when>
-									<c:otherwise>
-										<td>休み</td>
-									</c:otherwise>
-								</c:choose>
-						</tr>
+			<table border="1">
+				
+				<tr>
+					<th colspan="7">${ periodDateList[0].monthValue }</th>
+				</tr>
+				
+				<tr>
+					
+					<c:set var="firstDate" value="${ periodDateList[0] }"></c:set>
+					<c:set var="emptyCount" value="${ firstDate.dayOfWeek.value mod 7 }"></c:set>
+					
+					<c:forEach start="1" end="${ emptyCount }">
+						<td>　</td>
 					</c:forEach>
-				</c:when>
-				<c:otherwise>
-					今日の出勤予定はありません
-				</c:otherwise>
-			</c:choose>
+				
+					<c:forEach var="date" items="${ periodDateList }">
+						<c:set var="shift" value="${ shiftMap[date] }"></c:set>
+					
+						<td>
+							${ date.dayOfMonth }
+							
+							<c:choose>
+								<c:when test="${ not empty shift and dayOff }">
+									<br>　
+								</c:when>
+								<c:when test="${ not empty shift }">
+									<br>
+									${ shift.startTime }
+									<br>〜<br>
+									${ shift.endTime }
+								</c:when>
+							</c:choose>
+							
+						</td>
+						<c:if test="${ 'SATURDAY' eq date.dayOfWeek }">
+							</tr>
+							<tr>
+						</c:if>
+					</c:forEach>
+					
+				</tr>
+				
+			</table>
 		
-		</table>
+			<table>
+				
+				<c:choose>
+					<c:when test = "${ not empty todaysShift }">
+						<c:forEach var="s" items="${ todaysShift }">
+							<tr>
+								<td>${ s.userName }</td>
+									<c:choose>
+										<c:when test = "${ not s.dayOff }">
+											<td>${ s.startTime } ～ ${ s.endTime }</td>
+										</c:when>
+										<c:otherwise>
+											<td>休み</td>
+										</c:otherwise>
+									</c:choose>
+							</tr>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						今日の出勤予定はありません
+					</c:otherwise>
+				</c:choose>
+			
+			</table>
+		
+		</div>
 		
 		<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
 			<button type="submit" name="action" value="logout">ログアウト</button>

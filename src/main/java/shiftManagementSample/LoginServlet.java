@@ -57,7 +57,7 @@ public class LoginServlet extends HttpServlet {
 					u.setPassword( null );
 					String redirectPath;
 					
-					if ( ( "0" ).equals( u.getRole() ) ) {
+					if ( ( "1" ).equals( u.getRole() ) ) {
 						redirectPath = "/ManagerServlet";
 					} else {
 						redirectPath = "/StaffServlet";

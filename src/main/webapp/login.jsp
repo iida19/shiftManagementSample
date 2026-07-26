@@ -12,7 +12,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>ログイン</title>
-		<link href="<%=request.getContextPath() %>/css/style.css" rel="stylesheet" type="text/css">
+		<link href="${ pageContext.request.contextPath }/css/style.css" rel="stylesheet" type="text/css">
 	</head>
 
 	<body>
@@ -20,13 +20,31 @@
 		<div class="title">シフト管理アプリ</div>
 		
 		<div class="lg-area">
-			<form action="<%=request.getContextPath() %>/LoginServlet" method="post">
-				<div class="lg-tbox">
-					ユーザー名：<input type="text" name="userId" value="${ user.userId }">
-				</div>
-				<div class="lg-tbox">	
-					パスワード：<input type="password" name="password">
-				</div>	
+			<form action="${ pageContext.request.contextPath }/LoginServlet" method="post">
+				
+					<table>
+						<tr>
+							<div class="lg-tbox">
+								<td>
+									ユーザーID：
+								</td>
+								<td>
+									<input type="text" name="userId" value="${ user.userId }">
+								</td>
+							</div>
+						</tr>
+						<tr>
+							<div class="lg-tbox">	
+								<td>
+									パスワード：
+								</td>
+								<td>
+									<input type="password" name="password">
+								</td>
+							</div>
+						</tr>
+					</table>
+
 				<input type="submit" value="ログイン">
 			</form>
 		</div>

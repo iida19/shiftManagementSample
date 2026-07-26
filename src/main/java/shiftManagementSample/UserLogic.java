@@ -57,5 +57,16 @@ public class UserLogic {
 		}
 		return status;		
 	}
+	
+	
+	public static void deleteUser( String[] deleteId ) {
+		
+		for ( String s : deleteId ) {
+			
+			UserDAO.delete( s );
+			
+		}
+		
+	}
 
 }
