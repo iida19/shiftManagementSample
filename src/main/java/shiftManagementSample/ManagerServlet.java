@@ -43,10 +43,12 @@ public class ManagerServlet extends HttpServlet {
 		// ログイン直後
 		if ( action == null ) {
 				
-			List<ShiftBean> todaysShift = ShiftLogic.getTodaysShift( today );
+			List<ShiftBean> todaysShift = ShiftLogic.getTodaysShift( today );		
+			List<LocalTime> openingHours = ShiftLogic.getOpeningHours();
 					
 			session.setAttribute( "today", today );
 			session.setAttribute( "todaysShift", todaysShift );
+			session.setAttribute( "openingHours", openingHours );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/managerHome.jsp" );
 			rd.forward( request, response );
 			return;
@@ -58,11 +60,11 @@ public class ManagerServlet extends HttpServlet {
 			LocalDate targetDay = today.plusMonths( 1 );
 			List<ShiftBean> requestShiftList = ShiftLogic.getShiftOfPeriod( "requestShift", targetDay );
 			
-			List<LocalDate> periodDateList = ShiftLogic.createDateList( today );
+			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
 			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( requestShiftList, periodDateList );
 			
-			session.setAttribute( "periodDateList", periodDateList );
-			session.setAttribute( "shiftMap", shiftMap );
+			request.setAttribute( "periodDateList", periodDateList );
+			request.setAttribute( "shiftMap", shiftMap );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/checkRequestShift.jsp" );
 			rd.forward( request, response );
 			return;
@@ -71,9 +73,6 @@ public class ManagerServlet extends HttpServlet {
 		// シフト確定
 		} else if ( ( "confirmShift" ).equals( action ) ) {
 						
-			List<LocalTime> openingHours = ShiftLogic.getOpeningHours();
-						
-			session.setAttribute( "openingHours", openingHours );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/confirmShift.jsp" );
 			rd.forward( request, response );
 			return;
@@ -85,12 +84,42 @@ public class ManagerServlet extends HttpServlet {
 			LocalDate targetDay = today.plusMonths( 1 );
 			List<ShiftBean> confirmedShiftList = ShiftLogic.getShiftOfPeriod( "confirmedShift", targetDay );
 			
-			List<LocalDate> periodDateList = ShiftLogic.createDateList( today );
+			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
+			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( confirmedShiftList, periodDateList );
+			
+			List<LocalDate> confirmedPeriodList = ShiftLogic.findConfirmedPeriod( targetDay );
+			
+			session.setAttribute( "periodDateList", periodDateList );
+			session.setAttribute( "targetDay", targetDay );
+			session.setAttribute( "shiftMap", shiftMap );
+			session.setAttribute( "confirmedPeriodList", confirmedPeriodList );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/checkConfirmedShift.jsp" );
+			rd.forward( request, response );
+			return;
+			
+			
+		// 確定済みの他の月のシフトを見る
+		} else if ( ( "checkOtherPeriod" ).equals( action ) ) {
+			
+			String confirmedPeriodValue = request.getParameter( "confirmedPeriod" );
+			LocalDate targetDay = ShiftLogic.getTargetDay( confirmedPeriodValue );
+			
+			List<ShiftBean> confirmedShiftList = ShiftLogic.getShiftOfPeriod( "confirmedShift", targetDay );
+			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
 			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( confirmedShiftList, periodDateList );
 			
 			session.setAttribute( "periodDateList", periodDateList );
+			session.setAttribute( "targetDay", targetDay );
 			session.setAttribute( "shiftMap", shiftMap );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/checkConfirmedShift.jsp" );
+			rd.forward( request, response );
+			return;
+			
+		
+		// 確定済みシフトの修整
+		} else if ( ( "retouchShift" ).equals( action ) ) {
+			
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/retouchShift.jsp" );
 			rd.forward( request, response );
 			return;
 			

@@ -116,6 +116,36 @@ public class ShiftDAO {
     	}
     	return list;
     }
+    
+    
+    public static boolean findConfirmedPeriod( LocalDate start, LocalDate end ) {
+    	
+    	boolean found = false;
+    	
+    	String sql = "SELECT * FROM" + " confirmedShift" +
+    			" WHERE shiftDate >= ? AND shiftDate < ?";
+    	
+    	try (
+    			Connection con = DBManager.getConnection();
+    			PreparedStatement pstmt = con.prepareStatement( sql )
+    	) {
+    		
+    		pstmt.setObject( 1, start );
+    		pstmt.setObject( 2, end );
+    		
+    		try ( ResultSet rs = pstmt.executeQuery() ) {
+    			
+    			if ( rs.next() ) {
+    				found = true;
+    			}   			
+    		}
+    		
+    	} catch ( Exception e ) {
+    		e.printStackTrace( System.out );
+    		throw new RuntimeException( e );
+    	}
+    	return found;
+    }
 
 
     public static void save( ShiftBean s, String table ) {

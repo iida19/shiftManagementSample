@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <!DOCTYPE html>
 <html>
@@ -12,6 +13,8 @@
 	<body>
 	
 		<jsp:include page="staffHeader.jsp"></jsp:include>
+		
+		${ user.userName }さん、お疲れさまです
 		
 		<div style="display: flex; gap: 30px; align-items: flex-start;">
 			
@@ -26,9 +29,11 @@
 					<c:set var="firstDate" value="${ periodDateList[0] }"></c:set>
 					<c:set var="emptyCount" value="${ firstDate.dayOfWeek.value mod 7 }"></c:set>
 					
-					<c:forEach start="1" end="${ emptyCount }">
-						<td>　</td>
-					</c:forEach>
+					<c:if test="${ emptyCount > 0  }">
+						<c:forEach begin="1" end="${ emptyCount }">
+							<td></td>
+						</c:forEach>
+					</c:if>
 				
 					<c:forEach var="date" items="${ periodDateList }">
 						<c:set var="shift" value="${ shiftMap[date] }"></c:set>
@@ -37,9 +42,7 @@
 							${ date.dayOfMonth }
 							
 							<c:choose>
-								<c:when test="${ not empty shift and dayOff }">
-									<br>　
-								</c:when>
+								<c:when test="${ not empty shift and shift.dayOff }"></c:when>
 								<c:when test="${ not empty shift }">
 									<br>
 									${ shift.startTime }
@@ -55,6 +58,15 @@
 						</c:if>
 					</c:forEach>
 					
+					<c:set var="lastDate" value="${ periodDateList[ fn:length( periodDateList ) -1 ] }"></c:set>
+					<c:set var="lastEmptyCount" value="${ 6- ( lastDate.dayOfWeek.value mod 7 ) }"></c:set>
+					
+					<c:if test="${ lastEmptyCount > 0 }">
+						<c:forEach begin="1" end="${ lastEmptyCount }">
+							<td></td>
+						</c:forEach>
+					</c:if>
+					
 				</tr>
 				
 			</table>
@@ -63,6 +75,11 @@
 				
 				<c:choose>
 					<c:when test = "${ not empty todaysShift }">
+					
+						<tr>
+							<th>${ today }の出勤予定</th>
+						</tr>
+						
 						<c:forEach var="s" items="${ todaysShift }">
 							<tr>
 								<td>${ s.userName }</td>
@@ -86,9 +103,7 @@
 		
 		</div>
 		
-		<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
-			<button type="submit" name="action" value="logout">ログアウト</button>
-		</form>
+		<jsp:include page="staffFooter.jsp"></jsp:include>
 		
 	</body>
 

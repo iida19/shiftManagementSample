@@ -16,7 +16,35 @@
 		
 		<jsp:include page="managerHeader.jsp"></jsp:include>
 		
-		<table>	
+		<div style="display: flex; gap: 30px; align-items: flex-start;">
+		
+			<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
+		
+				<select name="confirmedPeriod">
+					<c:forEach var="confirmedPeriod" items="${ confirmedPeriodList }">
+						<c:choose>
+							<c:when test="${ confirmedPeriod eq targetDay }">
+								<option value="${ confirmedPeriod }" selected>${ confirmedPeriod.year }年${ confirmedPeriod.monthValue }月</option>
+							</c:when>
+							<c:otherwise>
+								<option value="${ confirmedPeriod }">${ confirmedPeriod.year }年${ confirmedPeriod.monthValue }月</option>
+							</c:otherwise>
+						</c:choose>	
+					</c:forEach>
+				</select>
+				
+				<button type="submit" name="action" value="checkOtherPeriod">閲覧</button>
+				
+			</form>
+			
+			<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
+				<input type="hidden" name="action" value="retouchShift">
+				<input type="submit" value="シフト修整">
+			</form>
+			
+		</div>
+		
+		<table border="1">
 		
 			<tr>
 				<th colspan="3">${ periodDateList[0].monthValue }月</th>
@@ -64,9 +92,7 @@
 		
 		</table>
 		
-		<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
-			<button type="submit" name="action" value="logout">ログアウト</button>
-		</form>
+		<jsp:include page="managerFooter.jsp"></jsp:include>
 
 	</body>
 

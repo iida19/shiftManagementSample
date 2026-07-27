@@ -16,7 +16,7 @@
 		
 		<jsp:include page="managerHeader.jsp"></jsp:include>
 		
-		<table>	
+		<table border="1">	
 		
 			<tr>
 				<th colspan="3">${ periodDateList[0].monthValue }月</th>
@@ -69,9 +69,7 @@
 			<input type="submit" value="シフト決定メニューへ">
 		</form>
 		
-		<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
-			<button type="submit" name="action" value="logout">ログアウト</button>
-		</form>
+		<jsp:include page="managerFooter.jsp"></jsp:include>
 
 	</body>
 

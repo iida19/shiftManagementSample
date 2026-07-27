@@ -63,11 +63,12 @@ public class StaffServlet extends HttpServlet {
 		// シフト希望登録
 		} else if ( ( "requestShift" ).equals( action ) ) {
 			
-			List<LocalDate> periodDateList = ShiftLogic.createDateList( today );
+			LocalDate targetDay = today.plusMonths( 1 );
+			
+			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
 			List<LocalTime> openingHours = ShiftLogic.getOpeningHours();
 			
 			// 一時保存済みデータの取得
-			LocalDate targetDay = today.plusMonths( 1 );
 			String table = "temporarySavedShift";
 			List<ShiftBean> temporaryShiftList = ShiftLogic.getShiftOfUser( table, u.getUserId(), targetDay );
 			
@@ -130,7 +131,7 @@ public class StaffServlet extends HttpServlet {
 				String db = "temporarySavedShift";
 				ShiftLogic.registerShiftList( temporaryShiftList, db );
 				
-				String message = "シフト希望を送信しました";
+				String message = "シフト希望を一時保存しました";
 				String redirectPath = "/StaffServlet";
 				
 				request.setAttribute( "message", message );

@@ -96,9 +96,7 @@
 		
 		</form>
 		
-		<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
-			<button type="submit" name="action" value="logout">ログアウト</button>
-		</form>
+		<jsp:include page="staffFooter.jsp"></jsp:include>
 
 	</body>
 

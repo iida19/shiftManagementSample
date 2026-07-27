@@ -14,10 +14,19 @@
 		
 		<jsp:include page="managerHeader.jsp"></jsp:include>
 		
+		${ user.userName }さん、お疲れさまです
+		<br>
+		本日は${ today }です
+		
 		<table>
 			
 			<c:choose>
 				<c:when test = "${ not empty todaysShift }">
+				
+					<tr>
+						<th>本日の出勤予定</th>
+					</tr>
+				
 					<c:forEach var="s" items="${ todaysShift }">
 						<tr>
 							<td>${ s.userName }</td>
@@ -39,9 +48,7 @@
 		
 		</table>
 		
-		<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
-			<button type="submit" name="action" value="logout">ログアウト</button>
-		</form>
+		<jsp:include page="managerFooter.jsp"></jsp:include>
 		
 	</body>
 

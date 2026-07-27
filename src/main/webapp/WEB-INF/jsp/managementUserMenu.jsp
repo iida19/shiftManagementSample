@@ -25,6 +25,9 @@
 			</form>
 			
 		</div>
+		
+		<jsp:include page="managerFooter.jsp"></jsp:include>
 
 	</body>
+	
 </html>

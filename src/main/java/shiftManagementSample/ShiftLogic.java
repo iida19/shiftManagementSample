@@ -37,15 +37,21 @@ public class ShiftLogic {
 	}
 	
 	
+	public static LocalDate getTargetDay( String targetPeriodValue ) {
+		
+		LocalDate date = LocalDate.parse( targetPeriodValue );
+		return date;
+		
+	}
+	
+	
 	public static List<ShiftBean> getShiftOfPeriod( String table, LocalDate targetDay ) {
 		
-		String[] monthPeriod = new String[2];
-		
-		monthPeriod[0] = String.valueOf( targetDay.getYear() );
-		monthPeriod[1] = String.valueOf( targetDay.getMonthValue() );
+		String targetYear = String.valueOf( targetDay.getYear() );
+		String targetMonth = String.valueOf( targetDay.getMonthValue() );
 	
-		int year = Integer.parseInt( monthPeriod[0] );
-		int month = Integer.parseInt( monthPeriod[1] );
+		int year = Integer.parseInt( targetYear );
+		int month = Integer.parseInt( targetMonth );
 		
 		LocalDate start = LocalDate.of( year, month, 1 );
 		LocalDate end = start.plusMonths( 1 );
@@ -59,13 +65,11 @@ public class ShiftLogic {
 	
 	public static List<ShiftBean> getShiftOfUser( String table, String userId, LocalDate targetDay ) {
 		
-		String[] monthPeriod = new String[2];
-		
-		monthPeriod[0] = String.valueOf( targetDay.getYear() );
-		monthPeriod[1] = String.valueOf( targetDay.getMonthValue() );
+		String targetYear = String.valueOf( targetDay.getYear() );
+		String targetMonth = String.valueOf( targetDay.getMonthValue() );
 	
-		int year = Integer.parseInt( monthPeriod[0] );
-		int month = Integer.parseInt( monthPeriod[1] );
+		int year = Integer.parseInt( targetYear );
+		int month = Integer.parseInt( targetMonth );
 		
 		LocalDate start = LocalDate.of( year, month, 1 );
 		LocalDate end = start.plusMonths( 1 );
@@ -74,6 +78,34 @@ public class ShiftLogic {
 		
 		return list;
 		
+	}
+	
+	
+	public static List<LocalDate> findConfirmedPeriod( LocalDate targetDay ) {
+		
+		List<LocalDate> confirmedPeriod = new ArrayList<LocalDate>();
+		
+		int i = 0;
+		while ( true ) {
+			
+			LocalDate searchingDay = targetDay.minusMonths( i );
+		
+			int year = searchingDay.getYear();
+			int month = searchingDay.getMonthValue();
+			
+			LocalDate start = LocalDate.of( year, month, 1 );
+			LocalDate end = start.plusMonths( 1 );
+			
+			boolean found = ShiftDAO.findConfirmedPeriod( start, end );
+			if ( found ) {
+				confirmedPeriod.add( searchingDay );
+				i ++;
+			} else {
+				break;
+			}
+			
+		}
+		return confirmedPeriod;
 	}
 	
 	

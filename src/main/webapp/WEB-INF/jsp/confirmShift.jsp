@@ -18,7 +18,7 @@
 		
 		<div style="display: flex; gap: 30px; align-items: flex-start;">
 		
-			<table>	
+			<table border="1">	
 			
 				<tr>
 					<th colspan="3">${ periodDateList[0].monthValue }月</th>
@@ -69,7 +69,7 @@
 				
 			<form action="${ pageContext.request.contextPath }/ManagerServlet" method="post">
 					
-				<table>	
+				<table border="1">	
 					
 					<tr>
 						<th>${ periodDateList[0].monthValue }月</th>
@@ -135,6 +135,8 @@
 			</form>
 		
 		</div>
+		
+		<jsp:include page="managerFooter.jsp"></jsp:include>
 
 	</body>
 

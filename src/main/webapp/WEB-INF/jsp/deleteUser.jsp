@@ -42,6 +42,9 @@
 			<input type="hidden" name="action" value="delete">
 			<input type="submit" value="削除">
 		</form>
+		
+		<jsp:include page="managerFooter.jsp"></jsp:include>
 
 	</body>
+	
 </html>

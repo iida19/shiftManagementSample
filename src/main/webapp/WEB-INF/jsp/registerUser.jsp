@@ -59,7 +59,9 @@
 		
 		<div class="em">
 			<%=em %>
-		</div>	
+		</div>
+		
+		<jsp:include page="managerFooter.jsp"></jsp:include>
 		
 	</body>
 	

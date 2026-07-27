@@ -46,6 +46,7 @@ public class SMSListener implements ServletContextListener {
 	                    id INT AUTO_INCREMENT PRIMARY KEY,
 	                    userName VARCHAR(50),
 	                    body VARCHAR(280),
+	                    important BOOLEAN,
 	                    postdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	                )
 	            """);
@@ -213,12 +214,12 @@ public class SMSListener implements ServletContextListener {
 	        	
 	        		List<ShiftBean> sampleList = List.of(
 	        			new ShiftBean(	"00002",
-	        									LocalDate.of( 2026, 7, 26 ), LocalTime.of( 9, 0 ), LocalTime.of( 14, 0 ) ),
-	        			new ShiftBean(	"00003", LocalDate.of( 2026, 7, 26 ), true ),
+	        									LocalDate.of( 2026, 7, 27 ), LocalTime.of( 9, 0 ), LocalTime.of( 14, 0 ) ),
+	        			new ShiftBean(	"00003", LocalDate.of( 2026, 7, 27 ), true ),
 	        			new ShiftBean(	"00004",
-												LocalDate.of( 2026, 7, 26 ), LocalTime.of( 17, 0 ), LocalTime.of( 22, 0 ) ),
+												LocalDate.of( 2026, 7, 27 ), LocalTime.of( 17, 0 ), LocalTime.of( 22, 0 ) ),
 	        			new ShiftBean(	"00005",
-								LocalDate.of( 2026, 7, 26 ), LocalTime.of( 9, 0 ), LocalTime.of( 22, 0 ) )
+								LocalDate.of( 2026, 7, 27 ), LocalTime.of( 9, 0 ), LocalTime.of( 22, 0 ) )
 	        			);
 	        	
 	        		for ( ShiftBean s : sampleList ) {

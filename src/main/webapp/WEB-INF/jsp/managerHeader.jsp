@@ -13,7 +13,7 @@
 		<div style="display: flex; gap: 30px; align-items: flex-start;">
 			
 			<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
-				<input type="submit" value="シフト希望一覧">
+				<input type="submit" value="ホームへ">
 			</form>
 		
 			<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
