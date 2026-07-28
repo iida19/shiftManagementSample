@@ -14,8 +14,6 @@
 	
 		<jsp:include page="staffHeader.jsp"></jsp:include>
 		
-		${ user.userName }さん、お疲れさまです
-		
 		<div style="display: flex; gap: 30px; align-items: flex-start;">
 			
 			<table border="1">

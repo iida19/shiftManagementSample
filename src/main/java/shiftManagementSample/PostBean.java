@@ -2,31 +2,36 @@ package shiftManagementSample;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class PostBean implements Serializable {
 	
 	
 	private int id;
+	private String userId;
 	private String userName;
 	private String body;
 	private boolean important;
-	private Timestamp postdate;
+	private LocalDateTime postdate;
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern( "yyyy/MM/dd HH:mm" );
 	
 	public PostBean() {}
 	
 	// 投稿時
-	public PostBean( String userName, String body, boolean important ) {
+	public PostBean( String userId, String body, boolean important ) {
 		
-		this.setUserName( userName );
+		this.setUserId( userId );
 		this.setBody( body );
 		this.setImportant( important );
 		
 	}
 	
 	// データベースとのやり取り時
-	public PostBean( int id, String userName, String body, boolean important, Timestamp postdate ) {
+	public PostBean( int id, String userId, String userName, String body, boolean important, Timestamp postdate ) {
 		
 		this.setId( id );
+		this.setUserId( userId );
 		this.setUserName( userName );
 		this.setBody( body );
 		this.setImportant( important );
@@ -42,13 +47,20 @@ public class PostBean implements Serializable {
 		this.id = id;
 	}
 	
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId( String userId ) {
+		this.userId = userId;
+	}
+	
 	public String getUserName() {
 		return userName;
 	}
 	public void setUserName( String userName ) {
 		this.userName = userName;
 	}
-	
+
 	public String getBody() {
 		return body;
 	}
@@ -63,11 +75,12 @@ public class PostBean implements Serializable {
 		this.important = important;
 	}
 
-	public Timestamp getPostdate() {
-		return postdate;
+	public String getFormattedPostdate() {
+		return postdate.format( FORMATTER );
 	}
 	public void setPostdate( Timestamp postdate ) {
-		this.postdate = postdate;
+		LocalDateTime postTiming = postdate.toLocalDateTime();
+		this.postdate = postTiming;
 	}
 	
 	

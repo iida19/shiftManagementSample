@@ -13,7 +13,9 @@ public class PostDAO {
 	public static List<PostBean> findAll() {
 		
 		List<PostBean> list = new ArrayList<PostBean>();
-		String sql = "SELECT * FROM forum ORDER BY postdate DESC";
+		String sql =	"SELECT * FROM forum" +
+							" INNER JOIN users ON forum.userId = users.userId" +
+							" ORDER BY postdate DESC";
 		
 		try (
 				Connection con = DBManager.getConnection();
@@ -24,6 +26,7 @@ public class PostDAO {
 			while ( rs.next() ) {
 					
 				PostBean p = new PostBean(	rs.getInt( "id" ),
+															rs.getString( "userId" ),
 															rs.getString( "userName" ),
 															rs.getString( "body" ),
 															rs.getBoolean( "important" ),
@@ -44,6 +47,7 @@ public class PostDAO {
 		
 		List<PostBean> list = new ArrayList<PostBean>();
 		String sql =	"SELECT * FROM forum" +
+							" INNER JOIN users ON forum.userId = users.userId" +
 							" WHERE important = TRUE" +
 							" ORDER BY postdate DESC";
 		
@@ -56,6 +60,7 @@ public class PostDAO {
 			while ( rs.next() ) {
 					
 				PostBean p = new PostBean(	rs.getInt( "id" ),
+															rs.getString( "userId" ),
 															rs.getString( "userName" ),
 															rs.getString( "body" ),
 															rs.getBoolean( "important" ),
@@ -74,11 +79,11 @@ public class PostDAO {
 	
 	public static void insert( PostBean p ) {
 		
-		String userName = p.getUserName();
+		String userId = p.getUserId();
 		String body = p.getBody();
 		boolean important = p.isImportant();
 		
-		String sql =	"INSERT INTO forum( userName, body, important ) " +
+		String sql =	"INSERT INTO forum( userId, body, important ) " +
 							"VALUES( ?, ?, ? )";
 										// id INT AUTO_INCREMENT PRIMARY KEY,
 										// postdate DEFAULT CURRENT_TIMESTAMP
@@ -88,7 +93,7 @@ public class PostDAO {
 			Connection con = DBManager.getConnection();
 			PreparedStatement pstmt = con.prepareStatement( sql );
 		) {
-			pstmt.setString( 1, userName );
+			pstmt.setString( 1, userId );
 			pstmt.setString( 2, body );
 			pstmt.setBoolean( 3, important );
 			pstmt.executeUpdate();

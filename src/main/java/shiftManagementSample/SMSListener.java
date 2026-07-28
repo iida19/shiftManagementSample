@@ -44,7 +44,7 @@ public class SMSListener implements ServletContextListener {
 	            st.execute("""
 	                CREATE TABLE IF NOT EXISTS forum(
 	                    id INT AUTO_INCREMENT PRIMARY KEY,
-	                    userName VARCHAR(50),
+	                    userId VARCHAR(10),
 	                    body VARCHAR(280),
 	                    important BOOLEAN,
 	                    postdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -161,7 +161,7 @@ public class SMSListener implements ServletContextListener {
 
 	        if ( count == 0 ) {
 	        	
-	        	String setSampleSql =	"INSERT INTO forum( userName, body, important ) " +
+	        	String setSampleSql =	"INSERT INTO forum( userId, body, important ) " +
 													"VALUES( ?, ?, ? )";
 
 	        	try (
@@ -169,13 +169,13 @@ public class SMSListener implements ServletContextListener {
 	        	) {
 	            
 	        		List<PostBean> sampleList = List.of(
-	        				new PostBean( "タクマ", "シフト希望は月末までに出してください", true ),
-	        				new PostBean( "ミナト", "すみません、誰か今日のシフト替わってください！", false ),
-	        				new PostBean( "メグミ", "私出れますよ！", false )
+	        				new PostBean( "00001", "シフト希望は月末までに出してください", true ),
+	        				new PostBean( "00002", "すみません、誰か今日のシフト替わってください！", false ),
+	        				new PostBean( "00003", "私出れますよ！", false )
 	        				);
 	        	
 	        		for ( PostBean p : sampleList ) {
-	        			pstmt2.setString( 1, p.getUserName() );
+	        			pstmt2.setString( 1, p.getUserId() );
 	        			pstmt2.setString( 2, p.getBody() );
 	        			pstmt2.setBoolean( 3, p.isImportant() );
 	        			pstmt2.executeUpdate();
@@ -215,12 +215,12 @@ public class SMSListener implements ServletContextListener {
 	        	
 	        		List<ShiftBean> sampleList = List.of(
 	        			new ShiftBean(	"00002",
-	        									LocalDate.of( 2026, 7, 28 ), LocalTime.of( 9, 0 ), LocalTime.of( 14, 0 ) ),
-	        			new ShiftBean(	"00003", LocalDate.of( 2026, 7, 28 ), true ),
+	        									LocalDate.of( 2026, 7, 29 ), LocalTime.of( 9, 0 ), LocalTime.of( 14, 0 ) ),
+	        			new ShiftBean(	"00003", LocalDate.of( 2026, 7, 29 ), true ),
 	        			new ShiftBean(	"00004",
-												LocalDate.of( 2026, 7, 28 ), LocalTime.of( 17, 0 ), LocalTime.of( 22, 0 ) ),
+												LocalDate.of( 2026, 7, 29 ), LocalTime.of( 17, 0 ), LocalTime.of( 22, 0 ) ),
 	        			new ShiftBean(	"00005",
-								LocalDate.of( 2026, 7, 28 ), LocalTime.of( 9, 0 ), LocalTime.of( 22, 0 ) )
+								LocalDate.of( 2026, 7, 29 ), LocalTime.of( 9, 0 ), LocalTime.of( 22, 0 ) )
 	        			);
 	        	
 	        		for ( ShiftBean s : sampleList ) {

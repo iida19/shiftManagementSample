@@ -1,32 +1,26 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<!DOCTYPE html>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+	
+${ user.userName }さん、お疲れさまです
 
-<html>
-	<head>
-		<meta charset="UTF-8">
-		<title>スタッフヘッダー</title>
-	</head>
+<div style="display: flex; gap: 30px; align-items: flex-start;">
 
-	<body>
-		
-		<div style="display: flex; gap: 30px; align-items: flex-start;">
-		
-			<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
-				<input type="submit" value="ホームへ">
-			</form>
-		
-			<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
-				<input type="hidden" name="action" value="requestShift">
-				<input type="submit" value="シフト希望提出">
-			</form>
-			
-			<form action="${ pageContext.request.contextPath }/ForumServlet" method="get">
-				<input type="submit" value="掲示板">
-			</form>
-		
-		</div>
+	<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
+		<input type="submit" value="ホームへ">
+	</form>
 
-	</body>
+	<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
+		<input type="hidden" name="action" value="requestShift">
+		<input type="submit" value="シフト希望提出">
+	</form>
+	
+	<form action="${ pageContext.request.contextPath }/ForumServlet" method="get">
+		<input type="submit" value="掲示板">
+	</form>
+	
+	<c:forEach var="importantPost" items="${ importantPostList }">
+		${ importantPost.body }
+	</c:forEach>
 
-</html>
+</div>

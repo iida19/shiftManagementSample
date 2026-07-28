@@ -1,6 +1,7 @@
 package shiftManagementSample;
 
 import java.io.IOException;
+import java.util.List;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -37,6 +38,10 @@ public class SMSFilter extends HttpFilter {
 		    response.sendRedirect( request.getContextPath() + "/login.jsp" );
 		    return;
 		}
+		
+		List<PostBean> importantPostList = PostDAO.findImportantPost();
+		
+		request.setAttribute( "importantPostList", importantPostList );
 		
 		chain.doFilter( request, response );
 		

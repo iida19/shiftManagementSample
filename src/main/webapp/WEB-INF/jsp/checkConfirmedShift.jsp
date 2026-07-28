@@ -44,7 +44,7 @@
 				
 			</form>
 			
-			<c:if test=${ sessionScope.user.role eq '0' }">
+			<c:if test="${ sessionScope.user.role eq '0' }">
 				<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
 					<input type="hidden" name="action" value="retouchShift">
 					<input type="submit" value="シフト修整">

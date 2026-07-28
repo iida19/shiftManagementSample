@@ -11,11 +11,9 @@
 	</head>
 
 	<body>
-		
-		<jsp:include page="managerHeader.jsp"></jsp:include>
-		
-		${ user.userName }さん、お疲れさまです
-		<br>
+
+		<jsp:include page="/WEB-INF/jsp/managerHeader.jsp" />
+
 		本日は${ today }です
 		
 		<table>
