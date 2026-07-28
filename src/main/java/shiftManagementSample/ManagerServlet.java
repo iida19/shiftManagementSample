@@ -223,6 +223,42 @@ public class ManagerServlet extends HttpServlet {
 				
 			}
 			
+			
+		// シフト修整
+		} else if ( ( "retouch" ).equals( action ) ) {
+			
+			List<ShiftBean> retouchShiftList = null;
+			
+			try {
+				
+				retouchShiftList = createShiftList( request );
+				
+				String db = "confirmedShift";
+				ShiftLogic.registerShiftList( retouchShiftList, db );
+				
+				String message = "シフトを修整しました";
+				String redirectPath = "/ManagerServlet";
+				
+				request.setAttribute( "message", message );
+				request.setAttribute( "redirectPath", redirectPath );
+				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/message.jsp" );
+				rd.forward( request, response );
+				return;
+				
+			} catch( IllegalArgumentException e ) {
+				
+				e.printStackTrace( System.out );
+				
+				String redirectPath = "/ManagerServlet";
+				
+				request.setAttribute( "message", e.getMessage() );
+				request.setAttribute( "redirectPath", redirectPath );
+				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/message.jsp" );
+				rd.forward( request, response );
+				return;
+				
+			}
+			
 		
 		// 新規従業員登録
 		} else if ( ( "register" ).equals( action ) ) {
@@ -331,8 +367,8 @@ public class ManagerServlet extends HttpServlet {
 			String startTimeValue = startTimeList[i];
 			String endTimeValue = endTimeList[i];
 			
-			boolean startBlank = startTimeValue == null || startTimeValue.isBlank();
-			boolean endBlank = endTimeValue == null || endTimeValue.isBlank();
+			boolean startBlank = ( startTimeValue == null || startTimeValue.isBlank() );
+			boolean endBlank = ( endTimeValue == null || endTimeValue.isBlank() );
 			
 			if ( startBlank != endBlank ) {
 				throw new IllegalArgumentException( shiftDate + "の時刻が正しく選択されていません" );
@@ -344,7 +380,8 @@ public class ManagerServlet extends HttpServlet {
 				sb.setShiftDate( shiftDate );
 			
 				// 休み
-				if ( startBlank && endBlank && allDay == null && dayOff == null ) {
+				if (	dayOff != null ||
+						( startBlank && endBlank && allDay == null && dayOff == null ) ) {
 				
 					sb.setDayOff( true );
 			

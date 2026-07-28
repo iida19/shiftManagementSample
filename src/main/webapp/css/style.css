@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+
+.importantMessage td {
+	background-color: #ffe4e1;
+	color: crimson;
+	font-weight: bold;
+}

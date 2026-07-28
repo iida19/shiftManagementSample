@@ -14,7 +14,14 @@
 
 	<body>
 		
-		<jsp:include page="managerHeader.jsp"></jsp:include>
+		<c:choose>
+			<c:when test="${ sessionScope.user.role eq '0' }">
+				<jsp:include page="staffHeader.jsp"></jsp:include>
+			</c:when>
+			<c:otherwise>
+				<jsp:include page="managerHeader.jsp"></jsp:include>
+			</c:otherwise>
+		</c:choose>
 		
 		<div style="display: flex; gap: 30px; align-items: flex-start;">
 		
@@ -37,10 +44,12 @@
 				
 			</form>
 			
-			<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
-				<input type="hidden" name="action" value="retouchShift">
-				<input type="submit" value="シフト修整">
-			</form>
+			<c:if test=${ sessionScope.user.role eq '0' }">
+				<form action="${ pageContext.request.contextPath }/ManagerServlet" method="get">
+					<input type="hidden" name="action" value="retouchShift">
+					<input type="submit" value="シフト修整">
+				</form>
+			</c:if>
 			
 		</div>
 		

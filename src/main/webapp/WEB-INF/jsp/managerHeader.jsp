@@ -31,6 +31,10 @@
 				<input type="submit" value="従業員管理">
 			</form>
 			
+			<form action="${ pageContext.request.contextPath }/ForumServlet" method="get">
+				<input type="submit" value="掲示板">
+			</form>
+			
 		</div>
 
 	</body>

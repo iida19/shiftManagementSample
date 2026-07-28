@@ -20,6 +20,10 @@
 				<input type="hidden" name="action" value="requestShift">
 				<input type="submit" value="シフト希望提出">
 			</form>
+			
+			<form action="${ pageContext.request.contextPath }/ForumServlet" method="get">
+				<input type="submit" value="掲示板">
+			</form>
 		
 		</div>
 

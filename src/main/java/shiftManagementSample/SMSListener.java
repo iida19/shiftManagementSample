@@ -161,22 +161,23 @@ public class SMSListener implements ServletContextListener {
 
 	        if ( count == 0 ) {
 	        	
-	        	String setSampleSql =	"INSERT INTO forum( userName, body ) " +
-													"VALUES( ?, ? )";
+	        	String setSampleSql =	"INSERT INTO forum( userName, body, important ) " +
+													"VALUES( ?, ?, ? )";
 
 	        	try (
 	        		PreparedStatement pstmt2 = con.prepareStatement( setSampleSql );
 	        	) {
 	            
 	        		List<PostBean> sampleList = List.of(
-	        				new PostBean( "タクマ", "シフト希望は月末までに出してください" ),
-	        				new PostBean( "ミナト", "すみません、誰か今日のシフト替わってください！" ),
-	        				new PostBean( "メグミ", "私出れますよ！" )
+	        				new PostBean( "タクマ", "シフト希望は月末までに出してください", true ),
+	        				new PostBean( "ミナト", "すみません、誰か今日のシフト替わってください！", false ),
+	        				new PostBean( "メグミ", "私出れますよ！", false )
 	        				);
 	        	
 	        		for ( PostBean p : sampleList ) {
 	        			pstmt2.setString( 1, p.getUserName() );
 	        			pstmt2.setString( 2, p.getBody() );
+	        			pstmt2.setBoolean( 3, p.isImportant() );
 	        			pstmt2.executeUpdate();
 	        		}
 	        		
@@ -214,12 +215,12 @@ public class SMSListener implements ServletContextListener {
 	        	
 	        		List<ShiftBean> sampleList = List.of(
 	        			new ShiftBean(	"00002",
-	        									LocalDate.of( 2026, 7, 27 ), LocalTime.of( 9, 0 ), LocalTime.of( 14, 0 ) ),
-	        			new ShiftBean(	"00003", LocalDate.of( 2026, 7, 27 ), true ),
+	        									LocalDate.of( 2026, 7, 28 ), LocalTime.of( 9, 0 ), LocalTime.of( 14, 0 ) ),
+	        			new ShiftBean(	"00003", LocalDate.of( 2026, 7, 28 ), true ),
 	        			new ShiftBean(	"00004",
-												LocalDate.of( 2026, 7, 27 ), LocalTime.of( 17, 0 ), LocalTime.of( 22, 0 ) ),
+												LocalDate.of( 2026, 7, 28 ), LocalTime.of( 17, 0 ), LocalTime.of( 22, 0 ) ),
 	        			new ShiftBean(	"00005",
-								LocalDate.of( 2026, 7, 27 ), LocalTime.of( 9, 0 ), LocalTime.of( 22, 0 ) )
+								LocalDate.of( 2026, 7, 28 ), LocalTime.of( 9, 0 ), LocalTime.of( 22, 0 ) )
 	        			);
 	        	
 	        		for ( ShiftBean s : sampleList ) {

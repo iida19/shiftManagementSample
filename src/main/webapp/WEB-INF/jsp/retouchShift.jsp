@@ -114,7 +114,7 @@
 					
 				</table>
 						
-				<button type="submit" name="action" value="confirm">送信</button>
+				<button type="submit" name="action" value="retouch">送信</button>
 					
 			</form>
 
