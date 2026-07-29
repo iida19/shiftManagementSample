@@ -9,15 +9,28 @@ import java.util.Map;
 
 public class ShiftLogic {
 	
+	
+	public static final int openingTime = 9;
+	public static final int closingTime = 22;
+	
 
-	public static List<LocalTime> getOpeningHours() {
+	public static List<LocalTime> getInputingHours() {
 		
 		List<LocalTime> openingHours = new ArrayList<LocalTime>();
 		
-		int openTime = 9;
-		int closeTime = 22;
+		for ( int i = openingTime; i <= closingTime; i ++ ) {
+			LocalTime hour = LocalTime.of( i, 0 );
+			openingHours.add( hour );
+		}
+		return openingHours;
+	}
+	
+	
+	public static List<LocalTime> getDisplayingHours() {
 		
-		for ( int i = openTime; i <= closeTime; i ++ ) {
+		List<LocalTime> openingHours = new ArrayList<LocalTime>();
+		
+		for ( int i = openingTime; i < closingTime; i ++ ) {
 			LocalTime hour = LocalTime.of( i, 0 );
 			openingHours.add( hour );
 		}
@@ -86,6 +99,7 @@ public class ShiftLogic {
 		List<LocalDate> confirmedPeriod = new ArrayList<LocalDate>();
 		
 		int i = 0;
+		int count = 0;	// 当月分がまだ確定していない時、スキップする
 		while ( true ) {
 			
 			LocalDate searchingDay = targetDay.minusMonths( i );
@@ -101,7 +115,13 @@ public class ShiftLogic {
 				confirmedPeriod.add( searchingDay );
 				i ++;
 			} else {
-				break;
+				if ( count == 0 ) {
+					count ++;
+					i ++;
+					continue;
+				} else {
+					break;
+				}
 			}
 			
 		}

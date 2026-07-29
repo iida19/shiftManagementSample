@@ -16,8 +16,6 @@ import jakarta.servlet.annotation.WebListener;
 public class SMSListener implements ServletContextListener {
 	
 	public void contextInitialized( ServletContextEvent sce ) {
-		
-		System.out.println( "Listenerが起動しました" );
 
 	    try {
 	    	
@@ -137,7 +135,7 @@ public class SMSListener implements ServletContextListener {
 	        			pstmt2.setString( 4, u.getRole() );
 	        			pstmt2.executeUpdate();
 	        		}
-	        	
+	        		System.out.println("ユーザーの初期データを登録しました");
 	        	}
 	        }
 	        
@@ -180,9 +178,7 @@ public class SMSListener implements ServletContextListener {
 	        			pstmt2.setBoolean( 3, p.isImportant() );
 	        			pstmt2.executeUpdate();
 	        		}
-	        		
 	        		System.out.println("掲示板の初期データを登録しました");
-	        		
 	        	}
 	        }
 	    } catch ( Exception e ) {
@@ -231,7 +227,7 @@ public class SMSListener implements ServletContextListener {
 	        			pstmt2.setBoolean( 5, s.isDayOff() );
 	        			pstmt2.executeUpdate();
 	        		}
-	        	
+	        		System.out.println( "シフトの初期データを登録しました" );
 	        	}
 	        }
 	        

@@ -67,12 +67,45 @@ public class ForumServlet extends HttpServlet {
 			String body = request.getParameter( "body" );
 			String important = request.getParameter( "important" );
 			
-			PostLogic.postToForum( u.getUserName(), body, important );
+			System.out.print( u.getUserName() + " " );
+			System.out.print( body + " " );
+			System.out.print( important );
+			
+			PostLogic.postToForum( u.getUserId(), body, important );
+			List<PostBean> postList = PostDAO.findAll();
+			
+			for ( PostBean p : postList ) {
+				System.out.println( p.getBody() );
+			}
+			
+			request.setAttribute( "postList", postList );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/forum.jsp" );
+			rd.forward( request, response );
+			return;
+			
+			
+		// 削除
+		} else if ( ( "delete" ).equals( action ) ) {
+			
+			String[] deleteIdValue = request.getParameterValues( "deleteId" );
+			
+			if ( deleteIdValue == null ) {
+				
+				String errorMessage = "削除するつぶやきが選択されていません！";
+				request.setAttribute( "em", errorMessage );
+				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/forum.jsp" );
+				rd.forward( request, response );
+				return;
+				
+			}
+			
+			PostLogic.deletePosts( deleteIdValue );
 			List<PostBean> postList = PostDAO.findAll();
 			request.setAttribute( "postList", postList );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/forum.jsp" );
 			rd.forward( request, response );
 			return;
+			
 			
 		}
 		

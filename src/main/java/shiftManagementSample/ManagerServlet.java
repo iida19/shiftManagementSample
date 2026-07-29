@@ -38,17 +38,22 @@ public class ManagerServlet extends HttpServlet {
 				
 		String action = request.getParameter( "action" );
 		LocalDate today = LocalDate.now();
+		String currentMenu;
 				
 				
 		// ログイン直後
 		if ( action == null ) {
 				
 			List<ShiftBean> todaysShift = ShiftLogic.getTodaysShift( today );		
-			List<LocalTime> openingHours = ShiftLogic.getOpeningHours();
-					
+			List<LocalTime> inputingHours = ShiftLogic.getInputingHours();
+			List<LocalTime> displayingHours = ShiftLogic.getDisplayingHours();
+			currentMenu = "home";
+			
+			request.setAttribute( "currentMenu", currentMenu );
 			session.setAttribute( "today", today );
 			session.setAttribute( "todaysShift", todaysShift );
-			session.setAttribute( "openingHours", openingHours );
+			session.setAttribute( "inputingHours", inputingHours );
+			session.setAttribute( "displayingHours", displayingHours );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/managerHome.jsp" );
 			rd.forward( request, response );
 			return;
@@ -59,12 +64,13 @@ public class ManagerServlet extends HttpServlet {
 			
 			LocalDate targetDay = today.plusMonths( 1 );
 			List<ShiftBean> requestShiftList = ShiftLogic.getShiftOfPeriod( "requestShift", targetDay );
-			
 			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
 			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( requestShiftList, periodDateList );
+			currentMenu = "checkRequest";
 			
-			request.setAttribute( "periodDateList", periodDateList );
-			request.setAttribute( "shiftMap", shiftMap );
+			request.setAttribute( "currentMenu", currentMenu );
+			session.setAttribute( "periodDateList", periodDateList );
+			session.setAttribute( "shiftMap", shiftMap );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/checkRequestShift.jsp" );
 			rd.forward( request, response );
 			return;
@@ -72,7 +78,10 @@ public class ManagerServlet extends HttpServlet {
 			
 		// シフト確定
 		} else if ( ( "confirmShift" ).equals( action ) ) {
-						
+			
+			currentMenu = "confirm";
+			
+			request.setAttribute( "currentMenu", currentMenu );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/confirmShift.jsp" );
 			rd.forward( request, response );
 			return;
@@ -83,12 +92,12 @@ public class ManagerServlet extends HttpServlet {
 									
 			LocalDate targetDay = today.plusMonths( 1 );
 			List<ShiftBean> confirmedShiftList = ShiftLogic.getShiftOfPeriod( "confirmedShift", targetDay );
-			
 			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
 			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( confirmedShiftList, periodDateList );
-			
 			List<LocalDate> confirmedPeriodList = ShiftLogic.findConfirmedPeriod( targetDay );
+			currentMenu = "checkConfirm";
 			
+			request.setAttribute( "currentMenu", currentMenu );
 			session.setAttribute( "periodDateList", periodDateList );
 			session.setAttribute( "targetDay", targetDay );
 			session.setAttribute( "shiftMap", shiftMap );
@@ -103,11 +112,12 @@ public class ManagerServlet extends HttpServlet {
 			
 			String confirmedPeriodValue = request.getParameter( "confirmedPeriod" );
 			LocalDate targetDay = ShiftLogic.getTargetDay( confirmedPeriodValue );
-			
 			List<ShiftBean> confirmedShiftList = ShiftLogic.getShiftOfPeriod( "confirmedShift", targetDay );
 			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
 			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( confirmedShiftList, periodDateList );
+			currentMenu = "checkConfirm";
 			
+			request.setAttribute( "currentMenu", currentMenu );
 			session.setAttribute( "periodDateList", periodDateList );
 			session.setAttribute( "targetDay", targetDay );
 			session.setAttribute( "shiftMap", shiftMap );
@@ -119,6 +129,9 @@ public class ManagerServlet extends HttpServlet {
 		// 確定済みシフトの修整
 		} else if ( ( "retouchShift" ).equals( action ) ) {
 			
+			currentMenu = "retouch";
+			
+			request.setAttribute( "currentMenu", currentMenu );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/retouchShift.jsp" );
 			rd.forward( request, response );
 			return;
@@ -127,6 +140,9 @@ public class ManagerServlet extends HttpServlet {
 		// 従業員管理
 		} else if ( ( "managementUser" ).equals( action ) ) {
 			
+			currentMenu = "management";
+			
+			request.setAttribute( "currentMenu", currentMenu );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/managementUserMenu.jsp" );
 			rd.forward( request, response );
 			return;
@@ -135,6 +151,9 @@ public class ManagerServlet extends HttpServlet {
 		// 新規従業員登録
 		} else if ( ( "registerUser" ).equals( action ) ) {
 			
+			currentMenu = "management";
+			
+			request.setAttribute( "currentMenu", currentMenu );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/registerUser.jsp" );
 			rd.forward( request, response );
 			return;
@@ -144,7 +163,9 @@ public class ManagerServlet extends HttpServlet {
 		} else if ( ( "deleteUser" ).equals( action ) ) {
 			
 			List<UserBean> userList = UserDAO.findAll();
+			currentMenu = "checkConfirm";
 			
+			request.setAttribute( "currentMenu", currentMenu );
 			request.setAttribute( "userList", userList );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/deleteUser.jsp" );
 			rd.forward( request, response );
@@ -186,6 +207,7 @@ public class ManagerServlet extends HttpServlet {
 		HttpSession session = request.getSession();
 				
 		String action = request.getParameter( "action" );
+		String currentMenu = "";
 		
 		
 		// シフトを確定する
@@ -203,6 +225,9 @@ public class ManagerServlet extends HttpServlet {
 				String message = "シフトを登録しました";
 				String redirectPath = "/ManagerServlet";
 				
+				currentMenu = "confirm";
+				
+				request.setAttribute( "currentMenu", currentMenu );
 				request.setAttribute( "message", message );
 				request.setAttribute( "redirectPath", redirectPath );
 				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/message.jsp" );
@@ -239,6 +264,9 @@ public class ManagerServlet extends HttpServlet {
 				String message = "シフトを修整しました";
 				String redirectPath = "/ManagerServlet";
 				
+				currentMenu = "retouch";
+				
+				request.setAttribute( "currentMenu", currentMenu );
 				request.setAttribute( "message", message );
 				request.setAttribute( "redirectPath", redirectPath );
 				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/message.jsp" );
@@ -266,6 +294,8 @@ public class ManagerServlet extends HttpServlet {
 			String userId = request.getParameter( "userId" );
 			String userName = request.getParameter( "userName" );
 			String role = request.getParameter( "role" );
+			
+			currentMenu = "management";
 		
 			UserBean u = new UserBean( userId, userName, role );
 			int status = UserLogic.registerUser( u );
@@ -276,7 +306,9 @@ public class ManagerServlet extends HttpServlet {
 				
 				String message = "登録しました。";
 				String redirectPath = "/ManagerServlet";
+				
 				request.setAttribute( "message", message );
+				request.setAttribute( "currentMenu", currentMenu );
 				request.setAttribute( "redirectPath", redirectPath );
 				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/message.jsp" );
 				rd.forward( request, response );
@@ -286,6 +318,7 @@ public class ManagerServlet extends HttpServlet {
 				
 				String errorMessage = "ユーザーID " + u.getUserId() + " が重複しています";
 				request.setAttribute( "em", errorMessage );
+				request.setAttribute( "currentMenu", currentMenu );
 				request.setAttribute( "userId", u.getUserId() );
 				request.setAttribute( "userName", u.getUserName() );
 				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/registerUser.jsp" );
@@ -296,6 +329,7 @@ public class ManagerServlet extends HttpServlet {
 						
 				String errorMessage = "入力されていない項目があるようです";
 				request.setAttribute( "em", errorMessage );
+				request.setAttribute( "currentMenu", currentMenu );
 				request.setAttribute( "userName", u.getUserName() );
 				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/registerUser.jsp" );
 				rd.forward( request, response );
@@ -306,6 +340,7 @@ public class ManagerServlet extends HttpServlet {
 				System.out.println( "register statusが未判定です" );
 				String errorMessage = "処理に問題が発生しました。すみませんがもう一度お試しください。";
 				request.setAttribute( "em", errorMessage );
+				request.setAttribute( "currentMenu", currentMenu );
 				request.setAttribute( "userName", u.getUserName() );
 				RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/registerUser.jsp" );
 				rd.forward( request, response );
@@ -322,7 +357,10 @@ public class ManagerServlet extends HttpServlet {
 			
 			String message = "削除しました。";
 			String redirectPath = "/ManagerServlet";
+			currentMenu = "management";
+			
 			request.setAttribute( "message", message );
+			request.setAttribute( "currentMenu", currentMenu );
 			request.setAttribute( "redirectPath", redirectPath );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/message.jsp" );
 			rd.forward( request, response );
@@ -339,9 +377,9 @@ public class ManagerServlet extends HttpServlet {
 		List<ShiftBean> confirmedShiftList = new ArrayList<ShiftBean>();
 		
 		HttpSession session = request.getSession();
-		List<LocalTime> openingHours = ( List<LocalTime> )session.getAttribute( "openingHours" );
+		List<LocalTime> inputingHours = ( List<LocalTime> )session.getAttribute( "inputingHours" );
 		
-		if ( openingHours == null || openingHours.isEmpty() ) {
+		if ( inputingHours == null || inputingHours.isEmpty() ) {
 		    throw new IllegalArgumentException( "画面情報を取得できませんでした。" );
 		}
 		
@@ -388,8 +426,8 @@ public class ManagerServlet extends HttpServlet {
 				// 終日
 				} else if ( allDay != null ) {
 				
-					sb.setStartTime( openingHours.getFirst() );
-					sb.setEndTime( openingHours.getLast() );
+					sb.setStartTime( inputingHours.getFirst() );
+					sb.setEndTime( inputingHours.getLast() );
 				
 					sb.setDayOff( false );
 			

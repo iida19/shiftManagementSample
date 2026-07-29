@@ -13,7 +13,7 @@ public class PostDAO {
 	public static List<PostBean> findAll() {
 		
 		List<PostBean> list = new ArrayList<PostBean>();
-		String sql =	"SELECT * FROM forum" +
+		String sql =	"SELECT forum.*, users.userName FROM forum" +
 							" INNER JOIN users ON forum.userId = users.userId" +
 							" ORDER BY postdate DESC";
 		

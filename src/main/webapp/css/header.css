@@ -1,0 +1,43 @@
+@charset "UTF-8";
+
+
+.systemHeader {
+	padding-top: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+	background-color: #000080;
+	color: #fff;
+}
+
+.header-message {
+	margin-top: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+	border: 1px solid crimson;
+	background-color: #ffe4e1;
+	color: crimson;
+	font-weight: bold;
+}
+
+.header-menu {
+	margin-top: 5px;
+	display: flex;
+	gap: 10px;
+	align-items: flex-start;
+}
+
+.header-menu input[type="submit"] {
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.header-menu input[type="submit"].active {
+    background-color: #dbe7ff;
+}
+
+.header-menu input[type="submit"]:hover {
+    background-color: #dbe7ff;
+}

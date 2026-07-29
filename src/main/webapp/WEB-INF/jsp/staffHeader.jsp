@@ -15,12 +15,17 @@ ${ user.userName }さん、お疲れさまです
 		<input type="submit" value="シフト希望提出">
 	</form>
 	
+	<form action="${ pageContext.request.contextPath }/StaffServlet" method="get">
+		<input type="hidden" name="action" value="checkConfirmedShift">
+		<input type="submit" value="確定シフト一覧">
+	</form>
+	
 	<form action="${ pageContext.request.contextPath }/ForumServlet" method="get">
 		<input type="submit" value="掲示板">
 	</form>
 	
 	<c:forEach var="importantPost" items="${ importantPostList }">
-		${ importantPost.body }
+		${ importantPost.body }<br>
 	</c:forEach>
 
 </div>

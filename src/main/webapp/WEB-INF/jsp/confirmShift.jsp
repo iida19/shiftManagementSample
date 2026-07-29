@@ -10,6 +10,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>シフト確定</title>
+		<link href="${ pageContext.request.contextPath }/css/style.css" rel="stylesheet" type="text/css">
 	</head>
 
 	<body>
@@ -18,10 +19,18 @@
 		
 		<div style="display: flex; gap: 30px; align-items: flex-start;">
 		
-			<table border="1">	
-			
+			<table class="shiftChart">	
+		
 				<tr>
-					<th colspan="3">${ periodDateList[0].monthValue }月</th>
+					<th colspan="${ fn:length( displayingHours ) +2 }">${ periodDateList[0].monthValue }月</th>
+				</tr>
+				
+				<tr>
+					<th>日付</th>
+					<th>名前</th>
+					<c:forEach var="hour" items="${ displayingHours }">
+						<td>${ hour.hour }</td>
+					</c:forEach>
 				</tr>
 				
 				<c:forEach var="date" items="${ periodDateList }">
@@ -38,16 +47,23 @@
 									</c:if>
 									
 									<td>${ shift.userName }</td>
-									<td>
 										<c:choose>
-											<c:when test="${ shift.dayOff }">
-												休み
+											<c:when test = "${ not shift.dayOff }">
+												<c:forEach var="hour" items="${ displayingHours }">											
+													<c:choose>
+														<c:when test="${ not hour.isBefore( shift.startTime ) and hour.isBefore( shift.endTime ) }">
+															<td class="working"></td>
+														</c:when>
+														<c:otherwise>
+															<td></td>
+														</c:otherwise>
+													</c:choose>
+												</c:forEach>
 											</c:when>
 											<c:otherwise>
-												${ shift.startTime }〜${ shift.endTime }
+												<td colspan="${ fn:length( displayingHours ) }">休み</td>
 											</c:otherwise>
 										</c:choose>
-									</td>
 									
 								</tr>
 							</c:forEach>
@@ -69,10 +85,17 @@
 				
 			<form action="${ pageContext.request.contextPath }/ManagerServlet" method="post">
 					
-				<table border="1">	
+				<table class="shiftForm">	
 					
 					<tr>
-						<th>${ periodDateList[0].monthValue }月</th>
+						<th colspan="4">${ periodDateList[0].monthValue }月</th>
+					</tr>
+					
+					<tr>
+						<th>日付</th>
+						<th>名前</th>
+						<th>開始～終了</th>
+						<th>終日</th>
 					</tr>
 					
 					<c:forEach var="date" items="${ periodDateList }">
@@ -97,20 +120,20 @@
 												
 												<select name="startTime">
 													<option value="">--選択--</option>
-													<c:forEach var="hour" items="${ openingHours }">
+													<c:forEach var="hour" items="${ inputingHours }">
 														<option value="${ hour }">${ hour }</option>
 													</c:forEach>
 												</select>
 												〜
 												<select name="endTime">
 													<option value="">--選択--</option>
-													<c:forEach var="hour" items="${ openingHours }">
+													<c:forEach var="hour" items="${ inputingHours }">
 														<option value="${ hour }">${ hour }</option>
 													</c:forEach>
 												</select>
 											</td>
 											<td>
-												<input type="checkbox" name="allDay_${ date }_${ shift.userId }" value="true">終日
+												<input type="checkbox" name="allDay_${ date }_${ shift.userId }" value="true">
 											</td>
 													
 										</tr>

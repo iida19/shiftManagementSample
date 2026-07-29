@@ -24,11 +24,11 @@
 					<th>${ periodDateList[0].monthValue }月</th>
 				</tr>
 				
-				<c:set var="last" value="${ fn:length( openingHours ) -1 }"></c:set>
+				<c:set var="last" value="${ fn:length( inputingHours ) -1 }"></c:set>
 			
 				<c:forEach var="date" items="${ periodDateList }">
 					<c:set var="shift" value="${ shiftMap[date] }"></c:set>
-					<c:set var="isAllDay" value="${ openingHours[0] eq shift.startTime and openingHours[last] eq shift.endTime }"></c:set>
+					<c:set var="isAllDay" value="${ inputingHours[0] eq shift.startTime and inputingHours[last] eq shift.endTime }"></c:set>
 					
 					<tr>
 						<td>${ date.dayOfMonth }日</td>
@@ -36,7 +36,7 @@
 							<input type="hidden" name="shiftDate" value="${ date }">
 							<select name="startTime">
 								<option value="">--選択--</option>
-								<c:forEach var="hour" items="${ openingHours }">
+								<c:forEach var="hour" items="${ inputingHours }">
 									<c:choose>
 										<c:when test="${ hour eq shift.startTime }">
 											<option value="${ hour }" selected>${ hour }</option>
@@ -50,7 +50,7 @@
 							〜
 							<select name="endTime">
 								<option value="">--選択--</option>
-								<c:forEach var="hour" items="${ openingHours }">
+								<c:forEach var="hour" items="${ inputingHours }">
 									<c:choose>
 										<c:when test="${ hour eq shift.endTime }">
 											<option value="${ hour }" selected>${ hour }</option>

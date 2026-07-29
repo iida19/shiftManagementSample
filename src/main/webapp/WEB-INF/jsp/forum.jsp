@@ -77,7 +77,7 @@
 									<td>
 										<c:choose>
 											<c:when test="${ post.userId eq user.userId or user.role eq '1' }">
-												<input type="checkbox" name="delete" value="${ post.id }">
+												<input type="checkbox" name="deleteId" value="${ post.id }">
 											</c:when>
 											<c:otherwise>
 												<input type="checkbox" disabled>

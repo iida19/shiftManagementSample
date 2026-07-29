@@ -1,6 +1,40 @@
 @charset "UTF-8";
 
 
+table.shiftChart {
+    border-collapse: collapse;
+}
+
+.shiftChart th {
+	width: 100px;
+	border: 1px solid #ddd;
+}
+
+.shiftChart td {
+    width: 24px;
+    height: 20px;
+    border: 1px solid #ddd;
+}
+
+.shiftChart td.working {
+    background-color: #ffe4e1;
+}
+
+
+table.shiftForm {
+	border-collapse: collapse;
+}
+
+.shiftForm th {
+	border: 1px solid #ddd;
+}
+
+.shiftForm td {
+    height: 20px;
+    border: 1px solid #ddd;
+}
+
+
 .importantMessage td {
 	background-color: #ffe4e1;
 	color: crimson;

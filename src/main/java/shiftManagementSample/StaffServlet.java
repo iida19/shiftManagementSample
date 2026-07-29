@@ -50,11 +50,15 @@ public class StaffServlet extends HttpServlet {
 			List<ShiftBean> thisMonthList = ShiftLogic.getShiftOfUser( table, u.getUserId(), today );
 			List<LocalDate> periodDateList = ShiftLogic.createDateList( today );
 			Map<LocalDate, ShiftBean> shiftMap = ShiftLogic.makeUserShiftMap( thisMonthList, periodDateList );
+			List<LocalTime> inputingHours = ShiftLogic.getInputingHours();
+			List<LocalTime> displayingHours = ShiftLogic.getDisplayingHours();
 			
 			request.setAttribute( "today", today );
 			request.setAttribute( "todaysShift", todaysShift );
 			request.setAttribute( "periodDateList", periodDateList );
 			request.setAttribute( "shiftMap", shiftMap );
+			session.setAttribute( "inputingHours", inputingHours );
+			session.setAttribute( "displayingHours", displayingHours );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/staffHome.jsp" );
 			rd.forward( request, response );
 			return;
@@ -66,7 +70,6 @@ public class StaffServlet extends HttpServlet {
 			LocalDate targetDay = today.plusMonths( 1 );
 			
 			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
-			List<LocalTime> openingHours = ShiftLogic.getOpeningHours();
 			
 			// 一時保存済みデータの取得
 			String table = "temporarySavedShift";
@@ -76,12 +79,49 @@ public class StaffServlet extends HttpServlet {
 			
 			request.setAttribute( "shiftMap", shiftMap );
 			request.setAttribute( "periodDateList", periodDateList );
-			session.setAttribute( "openingHours", openingHours );
 			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/requestShift.jsp" );
 			rd.forward( request, response );
 			return;
-		
 			
+			
+		// 確定したシフトの確認
+		} else if ( ( "checkConfirmedShift" ).equals( action ) ) {
+									
+			LocalDate targetDay = today.plusMonths( 1 );
+			List<ShiftBean> confirmedShiftList = ShiftLogic.getShiftOfPeriod( "confirmedShift", targetDay );
+			
+			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
+			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( confirmedShiftList, periodDateList );
+			
+			List<LocalDate> confirmedPeriodList = ShiftLogic.findConfirmedPeriod( targetDay );
+			
+			session.setAttribute( "periodDateList", periodDateList );
+			session.setAttribute( "targetDay", targetDay );
+			session.setAttribute( "shiftMap", shiftMap );
+			session.setAttribute( "confirmedPeriodList", confirmedPeriodList );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/checkConfirmedShift.jsp" );
+			rd.forward( request, response );
+			return;
+			
+			
+		// 確定済みの他の月のシフトを見る
+		} else if ( ( "checkOtherPeriod" ).equals( action ) ) {
+			
+			String confirmedPeriodValue = request.getParameter( "confirmedPeriod" );
+			LocalDate targetDay = ShiftLogic.getTargetDay( confirmedPeriodValue );
+			
+			List<ShiftBean> confirmedShiftList = ShiftLogic.getShiftOfPeriod( "confirmedShift", targetDay );
+			List<LocalDate> periodDateList = ShiftLogic.createDateList( targetDay );
+			Map<LocalDate, List<ShiftBean>> shiftMap = ShiftLogic.makeShiftMap( confirmedShiftList, periodDateList );
+			
+			session.setAttribute( "periodDateList", periodDateList );
+			session.setAttribute( "targetDay", targetDay );
+			session.setAttribute( "shiftMap", shiftMap );
+			RequestDispatcher rd = request.getRequestDispatcher( "/WEB-INF/jsp/checkConfirmedShift.jsp" );
+			rd.forward( request, response );
+			return;
+
+					
 		// ログアウト
 		} else if ( ( "logout" ).equals( action ) ) {
 			
@@ -204,9 +244,9 @@ public class StaffServlet extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		UserBean user = ( UserBean )session.getAttribute( "user" );
-		List<LocalTime> openingHours = ( List<LocalTime> )session.getAttribute( "openingHours" );
+		List<LocalTime> inputingHours = ( List<LocalTime> )session.getAttribute( "inputingHours" );
 		
-		if ( user == null || openingHours == null || openingHours.isEmpty() ) {
+		if ( user == null || inputingHours == null || inputingHours.isEmpty() ) {
 		    throw new IllegalArgumentException( "画面情報を取得できませんでした。" );
 		}
 		
@@ -242,8 +282,8 @@ public class StaffServlet extends HttpServlet {
 			// 終日OK
 			} else if ( allDay != null ) {
 				
-				sb.setStartTime( openingHours.getFirst() );
-				sb.setEndTime( openingHours.getLast() );
+				sb.setStartTime( inputingHours.getFirst() );
+				sb.setEndTime( inputingHours.getLast() );
 				
 				sb.setDayOff( false );
 			
@@ -279,9 +319,9 @@ public class StaffServlet extends HttpServlet {
 		
 		HttpSession session = request.getSession();
 		UserBean user = ( UserBean )session.getAttribute( "user" );
-		List<LocalTime> openingHours = ( List<LocalTime> )session.getAttribute( "openingHours" );
+		List<LocalTime> inputingHours = ( List<LocalTime> )session.getAttribute( "inputingHours" );
 		
-		if ( user == null || openingHours == null || openingHours.isEmpty() ) {
+		if ( user == null || inputingHours == null || inputingHours.isEmpty() ) {
 		    throw new IllegalArgumentException( "画面情報を取得できませんでした。" );
 		}
 		
@@ -320,8 +360,8 @@ public class StaffServlet extends HttpServlet {
 			// 終日OK
 			} else if ( allDay != null ) {
 				
-				sb.setStartTime( openingHours.getFirst() );
-				sb.setEndTime( openingHours.getLast() );
+				sb.setStartTime( inputingHours.getFirst() );
+				sb.setEndTime( inputingHours.getLast() );
 				
 				sb.setDayOff( false );
 			
